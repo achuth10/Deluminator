@@ -1,0 +1,50 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme - Dark Theme -->
+    <style name="Theme.Deluminator" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_200</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Background colors -->
+        <item name="android:colorBackground">@color/dark_background</item>
+        <item name="colorSurface">@color/dark_surface</item>
+        <item name="colorOnSurface">@color/dark_primary_text</item>
+        <item name="colorOnBackground">@color/dark_primary_text</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Text colors -->
+        <item name="android:textColorPrimary">@color/dark_primary_text</item>
+        <item name="android:textColorSecondary">@color/dark_secondary_text</item>
+        <!-- Custom attributes -->
+        <item name="cardBackgroundColor">@color/dark_card_background</item>
+        <item name="primaryTextColor">@color/dark_primary_text</item>
+        <item name="secondaryTextColor">@color/dark_secondary_text</item>
+        <item name="progressBackgroundColor">@color/progress_background_dark</item>
+    </style>
+
+    <!-- Calculator Button Styles - Dark Theme -->
+    <style name="CalculatorButtonStyle" parent="Widget.Material3.Button.TonalButton">
+        <item name="android:layout_margin">6dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="backgroundTint">?attr/colorSurfaceVariant</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:minHeight">60dp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="CalculatorOperatorButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:layout_margin">6dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+        <item name="cornerRadius">16dp</item>
+        <item name="android:minHeight">60dp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+</resources>
