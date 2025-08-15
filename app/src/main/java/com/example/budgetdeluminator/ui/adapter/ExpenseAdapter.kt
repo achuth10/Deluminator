@@ -53,10 +53,7 @@ class ExpenseAdapter(
 
                 // Set click listeners
                 root.setOnClickListener { onExpenseClick(expense) }
-                root.setOnLongClickListener {
-                    onExpenseLongClick(expense)
-                    true
-                }
+                btnDeleteExpense.setOnClickListener { onExpenseLongClick(expense) }
             }
         }
 

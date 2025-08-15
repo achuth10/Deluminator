@@ -19,7 +19,7 @@
         android:text="Deluminator"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@android:color/white"
+        android:textColor="@color/white"
         android:layout_marginBottom="4dp" />
 
     <TextView
@@ -27,6 +27,6 @@
         android:layout_height="wrap_content"
         android:text="Illuminate your spending"
         android:textSize="14sp"
-        android:textColor="@android:color/white" />
+        android:textColor="@color/white" />
 
 </LinearLayout>

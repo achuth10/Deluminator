@@ -6,7 +6,7 @@
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="8dp"
     app:cardElevation="2dp"
-    app:cardBackgroundColor="@android:color/white">
+    app:cardBackgroundColor="?attr/cardBackgroundColor">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,7 +28,7 @@
                 android:text="Food &amp; Dining"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/primaryTextColor"
                 android:layout_marginBottom="4dp" />
 
             <TextView
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="Budget: $500.00"
                 android:textSize="14sp"
-                android:textColor="@android:color/darker_gray" />
+                android:textColor="?attr/secondaryTextColor" />
 
         </LinearLayout>
 
@@ -62,7 +62,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delete"
-                android:textColor="#F44336"
+                android:textColor="@color/error_color"
                 android:textSize="12sp"
                 android:minWidth="60dp" />
 

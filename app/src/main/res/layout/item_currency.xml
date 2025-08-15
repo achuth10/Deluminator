@@ -41,7 +41,7 @@
                 android:text="Indian Rupee"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textColor="?attr/primaryTextColor" />
 
             <TextView
                 android:id="@+id/tvCurrencyCode"
@@ -50,7 +50,7 @@
                 android:text="INR"
                 android:textSize="12sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
+                android:textColor="?attr/primaryTextColor"
                 android:background="@color/design_default_color_primary"
                 android:paddingHorizontal="8dp"
                 android:paddingVertical="2dp"
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:text="India"
             android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="?attr/secondaryTextColor"
             android:layout_marginTop="2dp" />
 
     </LinearLayout>

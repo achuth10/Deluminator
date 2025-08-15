@@ -59,7 +59,7 @@
                     android:text="Custom"
                     android:textSize="12sp"
                     android:drawableStart="@android:drawable/ic_menu_my_calendar"
-                    android:drawableTint="#4285F4" />
+                    android:drawableTint="@color/info_color" />
 
             </LinearLayout>
 

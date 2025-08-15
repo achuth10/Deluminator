@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="8dp"
-    app:cardCornerRadius="6dp"
+    app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:cardBackgroundColor="@android:color/white">
+    app:cardBackgroundColor="?attr/cardBackgroundColor">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,7 +27,7 @@
                 android:text="Lunch at restaurant"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/primaryTextColor"
                 android:layout_marginBottom="4dp" />
 
             <TextView
@@ -36,19 +36,37 @@
                 android:layout_height="wrap_content"
                 android:text="Today, 2:30 PM"
                 android:textSize="12sp"
-                android:textColor="@android:color/darker_gray" />
+                android:textColor="?attr/secondaryTextColor" />
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/tvExpenseAmount"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="$25.50"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#F44336"
-            android:layout_gravity="center_vertical" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvExpenseAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$25.50"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/error_color"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnDeleteExpense"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_delete"
+                android:contentDescription="Delete expense"
+                android:padding="6dp"
+                android:tint="?attr/secondaryTextColor" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -19,7 +19,7 @@
             android:text="Expenses - Food &amp; Dining"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black" />
+            android:textColor="?attr/primaryTextColor" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnAddExpenseFromList"
@@ -44,7 +44,7 @@
         android:layout_height="300dp"
         android:text="No expenses yet.\nTap 'Add' to create your first expense."
         android:textSize="16sp"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="?attr/secondaryTextColor"
         android:gravity="center"
         android:visibility="gone" />
 

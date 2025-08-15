@@ -533,8 +533,18 @@ class MainActivity :
 
         // Amount field - open calculator when clicked
         dialogBinding.tvExpenseAmount.setOnClickListener {
-            dialog.dismiss()
-            showCalculatorDialog()
+            // Get current amount from the field
+            val currentAmountText = dialogBinding.tvExpenseAmount.text.toString()
+            val currentAmount =
+                    try {
+                        currencyPreferences.parseAmount(currentAmountText)
+                    } catch (e: Exception) {
+                        amount // fallback to original amount parameter if parsing fails
+                    }
+
+            showCalculatorDialogForEdit(currentAmount) { newAmount ->
+                dialogBinding.tvExpenseAmount.setText(currencyPreferences.formatAmount(newAmount))
+            }
         }
 
         // Date picker

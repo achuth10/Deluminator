@@ -16,7 +16,7 @@
         android:text="Aug 25, Wed"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@android:color/white" />
+        android:textColor="?attr/primaryTextColor" />
 
     <!-- Daily total amount -->
     <TextView
@@ -26,7 +26,7 @@
         android:text="₹ 17,661.00"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:textColor="#FF6B6B"
+        android:textColor="@color/error_color"
         android:layout_gravity="center_vertical" />
 
 </LinearLayout>

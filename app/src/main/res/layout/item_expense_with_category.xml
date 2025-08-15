@@ -57,16 +57,35 @@
 
         </LinearLayout>
 
-        <!-- Amount -->
-        <TextView
-            android:id="@+id/tvExpenseAmount"
+        <!-- Amount and Delete Button -->
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="₹ 852.00"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:layout_gravity="center_vertical" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvExpenseAmount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="₹ 852.00"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnDeleteExpense"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_delete"
+                android:contentDescription="Delete expense"
+                android:padding="6dp"
+                android:tint="@android:color/white"
+                android:alpha="0.8" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

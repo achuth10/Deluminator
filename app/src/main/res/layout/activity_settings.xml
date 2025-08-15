@@ -8,7 +8,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="?attr/android:colorBackground">
 
     <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
@@ -53,7 +53,7 @@
                 android:layout_marginBottom="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/white">
+                app:cardBackgroundColor="?attr/cardBackgroundColor">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -67,7 +67,7 @@
                         android:text="Currency Settings"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/black"
+                        android:textColor="?attr/primaryTextColor"
                         android:layout_marginBottom="16dp" />
 
                     <!-- Current Currency Display -->
@@ -100,7 +100,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Selected Currency"
                                 android:textSize="14sp"
-                                android:textColor="@android:color/darker_gray" />
+                                android:textColor="?attr/secondaryTextColor" />
 
                             <TextView
                                 android:id="@+id/tvSelectedCurrency"
@@ -109,7 +109,7 @@
                                 android:text="Indian Rupee (₹)"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black" />
+                                android:textColor="?attr/primaryTextColor" />
 
                         </LinearLayout>
 
@@ -117,7 +117,7 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@android:drawable/arrow_down_float"
-                            android:tint="@android:color/darker_gray" />
+                            android:tint="?attr/secondaryTextColor" />
 
                     </LinearLayout>
 
@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@android:color/white">
+                app:cardBackgroundColor="?attr/cardBackgroundColor">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -145,7 +145,7 @@
                         android:text="About Currency Settings"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:textColor="@android:color/black"
+                        android:textColor="?attr/primaryTextColor"
                         android:layout_marginBottom="8dp" />
 
                     <TextView
@@ -153,7 +153,7 @@
                         android:layout_height="wrap_content"
                         android:text="The selected currency will be used throughout the app for displaying amounts, budgets, and expenses. You can change this at any time."
                         android:textSize="14sp"
-                        android:textColor="@android:color/darker_gray"
+                        android:textColor="?attr/secondaryTextColor"
                         android:lineSpacingExtra="2dp" />
 
                 </LinearLayout>
