@@ -164,10 +164,18 @@ class MainActivity :
     }
 
     private fun startExpenseEntryFlow() {
-        showCalculatorDialog()
+        startExpenseEntryFlow(null)
+    }
+
+    private fun startExpenseEntryFlow(preselectedCategory: BudgetCategory?) {
+        showCalculatorDialog(preselectedCategory)
     }
 
     private fun showCalculatorDialog() {
+        showCalculatorDialog(null)
+    }
+
+    private fun showCalculatorDialog(preselectedCategory: BudgetCategory?) {
         val dialogBinding = DialogCalculatorBinding.inflate(LayoutInflater.from(this))
         var currentDisplay = "0"
         var expressionDisplay = ""
@@ -335,7 +343,7 @@ class MainActivity :
 
             if (finalValue > 0) {
                 dialog.dismiss()
-                showExpenseFormDialog(finalValue)
+                showExpenseFormDialog(finalValue, preselectedCategory)
             } else {
                 Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
             }
@@ -519,8 +527,12 @@ class MainActivity :
     }
 
     private fun showExpenseFormDialog(amount: Double) {
+        showExpenseFormDialog(amount, null)
+    }
+
+    private fun showExpenseFormDialog(amount: Double, preselectedCategory: BudgetCategory?) {
         val dialogBinding = DialogAddExpenseBinding.inflate(LayoutInflater.from(this))
-        var selectedCategory: BudgetCategory? = null
+        var selectedCategory: BudgetCategory? = preselectedCategory
         var selectedDate = System.currentTimeMillis() // Default to current time
 
         dialogBinding.tvExpenseAmount.setText(currencyPreferences.formatAmount(amount))
@@ -584,11 +596,15 @@ class MainActivity :
                     }
         }
 
-        // Auto-select first category if available
-        categoriesViewModel.allCategories.observe(this) { categories ->
-            if (categories.isNotEmpty() && selectedCategory == null) {
-                selectedCategory = categories[0]
-                dialogBinding.tvSelectedCategory.setText(categories[0].name)
+        // Set preselected category or auto-select first category if available
+        if (preselectedCategory != null) {
+            dialogBinding.tvSelectedCategory.setText(preselectedCategory.name)
+        } else {
+            categoriesViewModel.allCategories.observe(this) { categories ->
+                if (categories.isNotEmpty() && selectedCategory == null) {
+                    selectedCategory = categories[0]
+                    dialogBinding.tvSelectedCategory.setText(categories[0].name)
+                }
             }
         }
 
@@ -780,9 +796,9 @@ class MainActivity :
             }
         }
 
-        dialogBinding.btnAddExpenseFromList.setOnClickListener {
+        dialogBinding.fabAddExpenseFromList.setOnClickListener {
             dialog.dismiss()
-            startExpenseEntryFlow()
+            startExpenseEntryFlow(category)
         }
 
         dialogBinding.btnCloseExpenses.setOnClickListener { dialog.dismiss() }

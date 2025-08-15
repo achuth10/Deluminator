@@ -9,6 +9,6 @@
     <item
         android:id="@+id/nav_all_expenses"
         android:icon="@android:drawable/ic_menu_recent_history"
-        android:title="All Expenses" />
+        android:title="Expenses" />
     
 </menu>

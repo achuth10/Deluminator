@@ -1,36 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="16dp">
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:paddingBottom="72dp">
 
         <TextView
             android:id="@+id/tvExpensesTitle"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="Expenses - Food &amp; Dining"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="?attr/primaryTextColor" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddExpenseFromList"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Add"
-            android:textSize="12sp"
-            android:minHeight="32dp" />
-
-    </LinearLayout>
+            android:textColor="?attr/primaryTextColor"
+            android:layout_marginBottom="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewExpenses"
@@ -38,30 +27,43 @@
         android:layout_height="300dp"
         android:scrollbars="vertical" />
 
-    <TextView
-        android:id="@+id/tvNoExpenses"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:text="No expenses yet.\nTap 'Add' to create your first expense."
-        android:textSize="16sp"
-        android:textColor="?attr/secondaryTextColor"
-        android:gravity="center"
-        android:visibility="gone" />
+        <TextView
+            android:id="@+id/tvNoExpenses"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:text="No expenses yet.\nTap the + button to create your first expense."
+            android:textSize="16sp"
+            android:textColor="?attr/secondaryTextColor"
+            android:gravity="center"
+            android:visibility="gone" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:layout_marginTop="16dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCloseExpenses"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Close" />
+            android:orientation="horizontal"
+            android:gravity="start"
+            android:layout_marginTop="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCloseExpenses"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Close"
+                android:textSize="16sp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAddExpenseFromList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_input_add"
+        android:contentDescription="Add expense"
+        app:tint="@android:color/white" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
