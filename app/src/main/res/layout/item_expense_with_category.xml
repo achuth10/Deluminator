@@ -66,13 +66,19 @@
 
             <TextView
                 android:id="@+id/tvExpenseAmount"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="₹ 852.00"
-                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="8dp"
+                android:maxLines="1"
+                android:gravity="end"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="14sp"
+                android:autoSizeMaxTextSize="20sp"
+                android:autoSizeStepGranularity="1sp" />
 
             <ImageButton
                 android:id="@+id/btnDeleteExpense"

@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/NeumorphicCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="?attr/cardBackgroundColor">
+    android:layout_marginTop="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp">
 
         <!-- Category Header -->
         <LinearLayout
@@ -31,13 +30,13 @@
                 android:textStyle="bold"
                 android:textColor="?attr/primaryTextColor" />
 
-            <!-- Warning Icon -->
-            <ImageView
-                android:id="@+id/ivWarningIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/ic_dialog_alert"
-                android:tint="@color/error_color"
+            <!-- Warning Indicator -->
+            <View
+                android:id="@+id/viewWarningIndicator"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@drawable/circle_background"
+                android:backgroundTint="@color/error_color"
                 android:layout_marginEnd="8dp"
                 android:layout_gravity="center_vertical"
                 android:visibility="gone" />
@@ -49,7 +48,8 @@
                 android:text="$180 left"
                 android:textSize="14sp"
                 android:textStyle="bold"
-                android:textColor="@color/success_color" />
+                android:textColor="@color/success_color"
+                android:maxLines="1" />
 
         </LinearLayout>
 
@@ -66,7 +66,8 @@
                 android:layout_height="wrap_content"
                 android:text="$320"
                 android:textSize="14sp"
-                android:textColor="?attr/primaryTextColor" />
+                android:textColor="?attr/primaryTextColor"
+                android:maxLines="1" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -81,7 +82,8 @@
                 android:layout_height="wrap_content"
                 android:text="$500"
                 android:textSize="14sp"
-                android:textColor="?attr/secondaryTextColor" />
+                android:textColor="?attr/secondaryTextColor"
+                android:maxLines="1" />
 
         </LinearLayout>
 

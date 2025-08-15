@@ -104,12 +104,17 @@
 
                             <TextView
                                 android:id="@+id/tvSelectedCurrency"
-                                android:layout_width="wrap_content"
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
+                                android:layout_weight="1"
                                 android:text="Indian Rupee (₹)"
-                                android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textColor="?attr/primaryTextColor" />
+                                android:textColor="?attr/primaryTextColor"
+                                android:maxLines="1"
+                                android:autoSizeTextType="uniform"
+                                android:autoSizeMinTextSize="14sp"
+                                android:autoSizeMaxTextSize="18sp"
+                                android:autoSizeStepGranularity="1sp" />
 
                         </LinearLayout>
 
@@ -127,11 +132,10 @@
 
             <!-- About Currency Section -->
             <com.google.android.material.card.MaterialCardView
+                style="@style/NeumorphicCardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                app:cardBackgroundColor="?attr/cardBackgroundColor">
+                android:layout_marginTop="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"

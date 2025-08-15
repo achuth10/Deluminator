@@ -4,9 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="?attr/cardBackgroundColor">
+    style="@style/NeumorphicCardStyle"
+    android:layout_marginTop="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -33,11 +32,16 @@
 
             <TextView
                 android:id="@+id/tvBudgetLimit"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:text="Budget: $500.00"
-                android:textSize="14sp"
-                android:textColor="?attr/secondaryTextColor" />
+                android:textColor="?attr/secondaryTextColor"
+                android:maxLines="1"
+                android:autoSizeTextType="uniform"
+                android:autoSizeMinTextSize="12sp"
+                android:autoSizeMaxTextSize="16sp"
+                android:autoSizeStepGranularity="1sp" />
 
         </LinearLayout>
 
@@ -48,23 +52,25 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEditCategory"
-                style="@style/Widget.Material3.Button.TextButton"
+                style="@style/NeumorphicTextButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Edit"
                 android:textSize="12sp"
                 android:minWidth="60dp"
+                android:minHeight="36dp"
                 android:layout_marginEnd="8dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeleteCategory"
-                style="@style/Widget.Material3.Button.TextButton"
+                style="@style/NeumorphicTextButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delete"
                 android:textColor="@color/error_color"
                 android:textSize="12sp"
-                android:minWidth="60dp" />
+                android:minWidth="60dp"
+                android:minHeight="36dp" />
 
         </LinearLayout>
 

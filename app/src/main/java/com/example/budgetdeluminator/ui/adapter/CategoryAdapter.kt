@@ -69,10 +69,10 @@ class CategoryAdapter(
 
                 // Show/hide warning elements
                 if (isApproachingLimit && !isOverBudget) {
-                    ivWarningIcon.visibility = View.VISIBLE
+                    viewWarningIndicator.visibility = View.VISIBLE
                     tvWarningText.visibility = View.VISIBLE
                 } else {
-                    ivWarningIcon.visibility = View.GONE
+                    viewWarningIndicator.visibility = View.GONE
                     tvWarningText.visibility = View.GONE
                 }
 

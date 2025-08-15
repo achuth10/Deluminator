@@ -80,15 +80,10 @@
 
         <!-- Amount Section -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/NeumorphicTextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:hint="Amount"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
             app:endIconMode="none">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -107,15 +102,10 @@
 
         <!-- Category Section -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/NeumorphicTextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
             android:hint="Category"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp"
             app:endIconMode="dropdown_menu">
 
             <AutoCompleteTextView
@@ -136,14 +126,11 @@
 
         <!-- Note Section -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/NeumorphicTextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Note (optional)"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp">
+            android:layout_marginBottom="0dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etExpenseNote"
@@ -169,14 +156,11 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveExpense"
-            style="@style/Widget.Material3.Button"
+            style="@style/NeumorphicButtonPrimaryStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Save"
-            android:textSize="16sp"
-            android:minWidth="64dp"
-            android:paddingHorizontal="24dp"
-            app:backgroundTint="?attr/colorPrimary" />
+            android:minWidth="120dp" />
 
     </LinearLayout>
 

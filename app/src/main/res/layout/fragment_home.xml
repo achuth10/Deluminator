@@ -9,22 +9,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="16dp">
 
         <!-- Budget Overview Card -->
         <com.google.android.material.card.MaterialCardView
+            style="@style/NeumorphicCardStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="?attr/cardBackgroundColor">
+            android:layout_marginTop="0dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -49,81 +48,99 @@
 
                 </LinearLayout>
 
-                <!-- Total Budget -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Total Budget"
-                        android:textSize="16sp"
-                        android:textColor="?attr/primaryTextColor" />
-
-                    <TextView
-                        android:id="@+id/tvTotalBudget"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="$1950"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/primaryTextColor" />
-
-                </LinearLayout>
-
-                <!-- Total Spent -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="8dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Total Spent"
-                        android:textSize="16sp"
-                        android:textColor="?attr/primaryTextColor" />
-
-                    <TextView
-                        android:id="@+id/tvTotalSpent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="$1580"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/error_color" />
-
-                </LinearLayout>
-
-                <!-- Remaining -->
+                <!-- Budget Summary - Horizontal Layout -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="16dp">
 
-                    <TextView
+                    <!-- Total -->
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Remaining"
-                        android:textSize="16sp"
-                        android:textColor="?attr/primaryTextColor" />
+                        android:orientation="vertical"
+                        android:gravity="center">
 
-                    <TextView
-                        android:id="@+id/tvRemaining"
-                        android:layout_width="wrap_content"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total"
+                            android:textSize="14sp"
+                            android:textColor="?attr/secondaryTextColor"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/tvTotalBudget"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$0"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="?attr/primaryTextColor"
+                            android:maxLines="1"
+                            android:gravity="center" />
+
+                    </LinearLayout>
+
+                    <!-- Spent -->
+                    <LinearLayout
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="$370"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/success_color" />
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Spent"
+                            android:textSize="14sp"
+                            android:textColor="?attr/secondaryTextColor"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/tvTotalSpent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$0"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/error_color"
+                            android:maxLines="1"
+                            android:gravity="center" />
+
+                    </LinearLayout>
+
+                    <!-- Left -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Left"
+                            android:textSize="14sp"
+                            android:textColor="?attr/secondaryTextColor"
+                            android:layout_marginBottom="4dp" />
+
+                        <TextView
+                            android:id="@+id/tvRemaining"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="$0"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/success_color"
+                            android:maxLines="1"
+                            android:gravity="center" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -140,16 +157,6 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
-
-        <!-- Category Budgets Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Category Budgets"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="?attr/primaryTextColor"
-            android:layout_marginBottom="16dp" />
 
         <!-- Categories RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
