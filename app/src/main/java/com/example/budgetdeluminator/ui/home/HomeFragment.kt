@@ -77,6 +77,15 @@ class HomeFragment : Fragment() {
         homeViewModel.categoriesWithExpenses.observe(viewLifecycleOwner) { categoriesWithExpenses ->
             categoryAdapter.submitList(categoriesWithExpenses)
             updateOverviewData()
+
+            // Show/hide empty state
+            if (categoriesWithExpenses.isEmpty()) {
+                binding.recyclerViewCategories.visibility = View.GONE
+                binding.layoutEmptyState.visibility = View.VISIBLE
+            } else {
+                binding.recyclerViewCategories.visibility = View.VISIBLE
+                binding.layoutEmptyState.visibility = View.GONE
+            }
         }
 
         homeViewModel.selectedMonth.observe(viewLifecycleOwner) { _ -> updateCurrentMonthDisplay() }

@@ -63,6 +63,15 @@ class CategoriesFragment : Fragment() {
         private fun setupObservers() {
                 categoriesViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
                         categoryAdapter.submitList(categories)
+
+                        // Show/hide empty state
+                        if (categories.isEmpty()) {
+                                binding.recyclerViewCategories.visibility = View.GONE
+                                binding.layoutEmptyState.visibility = View.VISIBLE
+                        } else {
+                                binding.recyclerViewCategories.visibility = View.VISIBLE
+                                binding.layoutEmptyState.visibility = View.GONE
+                        }
                 }
 
                 // Fix any existing categories with missing colors

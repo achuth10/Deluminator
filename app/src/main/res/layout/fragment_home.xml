@@ -186,6 +186,52 @@
             android:layout_height="wrap_content"
             android:nestedScrollingEnabled="false" />
 
+        <!-- Empty State -->
+        <LinearLayout
+            android:id="@+id/layoutEmptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:src="@android:drawable/ic_input_add"
+                android:tint="?attr/secondaryTextColor"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="No categories yet"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="?attr/secondaryTextColor"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Create your first category to start tracking your budget"
+                android:textSize="14sp"
+                android:textColor="?attr/secondaryTextColor"
+                android:textAlignment="center"
+                android:layout_marginBottom="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Go to Categories tab to get started"
+                android:textSize="12sp"
+                android:textColor="?attr/secondaryTextColor"
+                android:textStyle="italic"
+                android:textAlignment="center" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

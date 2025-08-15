@@ -9,12 +9,10 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.data.entity.Expense
-import com.example.budgetdeluminator.data.entity.ExpenseSource
 import com.example.budgetdeluminator.data.entity.RecurrenceType
 import com.example.budgetdeluminator.data.entity.RecurringExpense
 import com.example.budgetdeluminator.data.model.CategoryWithExpenses
@@ -99,9 +97,6 @@ class MainActivity :
         setupFragments()
         setupBottomNavigation()
         setupClickListeners()
-
-        // Add default categories if database is empty
-        addDefaultCategoriesIfNeeded()
 
         // Initialize recurring expense scheduling
         val recurrenceScheduler = RecurrenceScheduler(this)
@@ -886,34 +881,6 @@ class MainActivity :
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
-    }
-
-    private fun addDefaultCategoriesIfNeeded() {
-        // Add sample categories if none exist
-        homeViewModel.categoriesWithExpenses.observe(
-                this,
-                object : Observer<List<CategoryWithExpenses>> {
-                    override fun onChanged(value: List<CategoryWithExpenses>) {
-                        if (value.isEmpty()) {
-                            // Add comprehensive default categories with appropriate colors
-                            val defaultCategories =
-                                    Constants.DEFAULT_CATEGORIES.map { defaultCategory ->
-                                        BudgetCategory(
-                                                name = defaultCategory.name,
-                                                budgetLimit = defaultCategory.budgetLimit,
-                                                color = defaultCategory.color
-                                        )
-                                    }
-
-                            defaultCategories.forEach { category ->
-                                categoriesViewModel.insertCategory(category)
-                            }
-                        }
-                        // Remove observer after first call
-                        homeViewModel.categoriesWithExpenses.removeObserver(this)
-                    }
-                }
-        )
     }
 
     // Fragment interface implementations
