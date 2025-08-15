@@ -6,6 +6,19 @@
     android:orientation="vertical"
     android:background="?attr/android:colorBackground">
 
+    <!-- Page Title -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="All Expenses"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="?attr/primaryTextColor"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="24dp"
+        android:gravity="start" />
+
     <!-- Filter Section -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"

@@ -51,12 +51,10 @@
 
     <!-- Calculator Button Styles - Dark Theme -->
         <style name="CalculatorButtonStyle" parent="Widget.Material3.Button.TonalButton">
-        <item name="android:layout_margin">6dp</item>
+        <item name="android:layout_margin">4dp</item>
         <item name="android:textColor">?attr/primaryTextColor</item>
         <item name="backgroundTint">?attr/colorSurfaceVariant</item>
         <item name="cornerRadius">16dp</item>
-        <item name="android:minHeight">48dp</item>
-        <item name="android:minWidth">48dp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:maxLines">1</item>
         <item name="android:singleLine">true</item>
@@ -67,18 +65,17 @@
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
         <item name="android:autoSizeTextType">uniform</item>
-        <item name="android:autoSizeMinTextSize">12sp</item>
-        <item name="android:autoSizeMaxTextSize">20sp</item>
+        <item name="android:autoSizeMinTextSize">10sp</item>
+        <item name="android:autoSizeMaxTextSize">24sp</item>
         <item name="android:autoSizeStepGranularity">1sp</item>
+        <item name="android:padding">8dp</item>
     </style>
 
     <style name="CalculatorOperatorButtonStyle" parent="Widget.Material3.Button">
-        <item name="android:layout_margin">6dp</item>
+        <item name="android:layout_margin">4dp</item>
         <item name="android:textColor">@color/white</item>
         <item name="backgroundTint">?attr/colorPrimary</item>
         <item name="cornerRadius">16dp</item>
-        <item name="android:minHeight">48dp</item>
-        <item name="android:minWidth">48dp</item>
         <item name="android:textStyle">normal</item>
         <item name="android:maxLines">1</item>
         <item name="android:singleLine">true</item>
@@ -89,9 +86,10 @@
         <item name="android:insetLeft">0dp</item>
         <item name="android:insetRight">0dp</item>
         <item name="android:autoSizeTextType">uniform</item>
-        <item name="android:autoSizeMinTextSize">12sp</item>
-        <item name="android:autoSizeMaxTextSize">20sp</item>
+        <item name="android:autoSizeMinTextSize">10sp</item>
+        <item name="android:autoSizeMaxTextSize">24sp</item>
         <item name="android:autoSizeStepGranularity">1sp</item>
+        <item name="android:padding">8dp</item>
     </style>
 
     <!-- Neumorphic Button Styles - Dark Theme -->

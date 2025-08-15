@@ -1,5 +1,6 @@
 package com.example.budgetdeluminator.ui.home
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.budgetdeluminator.databinding.FragmentHomeBinding
 import com.example.budgetdeluminator.ui.adapter.CategoryAdapter
 import com.example.budgetdeluminator.utils.CurrencyPreferences
+import com.example.budgetdeluminator.utils.DateUtils
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -37,6 +39,7 @@ class HomeFragment : Fragment() {
         currencyPreferences = CurrencyPreferences(requireContext())
         setupRecyclerView()
         setupObservers()
+        setupClickListeners()
     }
 
     private fun setupRecyclerView() {
@@ -66,11 +69,17 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun setupClickListeners() {
+        binding.chipCurrentMonth.setOnClickListener { showMonthSelector() }
+    }
+
     private fun setupObservers() {
         homeViewModel.categoriesWithExpenses.observe(viewLifecycleOwner) { categoriesWithExpenses ->
             categoryAdapter.submitList(categoriesWithExpenses)
             updateOverviewData()
         }
+
+        homeViewModel.selectedMonth.observe(viewLifecycleOwner) { _ -> updateCurrentMonthDisplay() }
     }
 
     private fun updateOverviewData() {
@@ -119,6 +128,45 @@ class HomeFragment : Fragment() {
                         else -> android.graphics.Color.parseColor("#4CAF50") // Green otherwise
                     }
             tvRemaining.setTextColor(leftColor)
+        }
+    }
+
+    private fun updateCurrentMonthDisplay() {
+        binding.chipCurrentMonth.text = homeViewModel.getCurrentSelectedMonthName()
+    }
+
+    private fun showMonthSelector() {
+        homeViewModel.availableMonths.value?.let { availableMonths ->
+            if (availableMonths.isEmpty()) {
+                return
+            }
+
+            val monthNames =
+                    availableMonths
+                            .map { (month, year) -> "${DateUtils.getMonthName(month)} $year" }
+                            .toTypedArray()
+
+            val currentSelection = homeViewModel.selectedMonth.value
+            var selectedIndex =
+                    if (currentSelection != null) {
+                        availableMonths.indexOfFirst {
+                            it.first == currentSelection.first &&
+                                    it.second == currentSelection.second
+                        }
+                    } else {
+                        -1
+                    }
+            if (selectedIndex == -1) selectedIndex = 0
+
+            AlertDialog.Builder(requireContext())
+                    .setTitle("Select Month")
+                    .setSingleChoiceItems(monthNames, selectedIndex) { dialog, which ->
+                        val selectedMonth = availableMonths[which]
+                        homeViewModel.selectMonth(selectedMonth.first, selectedMonth.second)
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Cancel", null)
+                    .show()
         }
     }
 

@@ -8,6 +8,7 @@ import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.data.entity.Expense
 import com.example.budgetdeluminator.data.model.CategoryWithExpenses
 import com.example.budgetdeluminator.data.model.ExpenseWithCategory
+import java.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -52,6 +53,20 @@ class BudgetRepository(
                         expenseDao.getTotalSpentByCategory(categoryId) ?: 0.0
                 }
 
+        suspend fun getTotalSpentByCategoryThisMonth(categoryId: Long): Double =
+                withContext(Dispatchers.IO) {
+                        val monthStart =
+                                com.example.budgetdeluminator.utils.DateUtils.getCurrentMonthStart()
+                        val monthEnd =
+                                com.example.budgetdeluminator.utils.DateUtils.getCurrentMonthEnd()
+                        expenseDao.getTotalSpentByCategoryInDateRange(
+                                categoryId,
+                                monthStart,
+                                monthEnd
+                        )
+                                ?: 0.0
+                }
+
         suspend fun insertExpense(expense: Expense): Long =
                 withContext(Dispatchers.IO) { expenseDao.insertExpense(expense) }
 
@@ -89,5 +104,67 @@ class BudgetRepository(
                         categories.sumOf { category ->
                                 expenseDao.getTotalSpentByCategory(category.id) ?: 0.0
                         }
+                }
+
+        suspend fun getTotalSpentThisMonth(): Double =
+                withContext(Dispatchers.IO) {
+                        val categories = budgetCategoryDao.getAllCategories().value ?: emptyList()
+                        val monthStart =
+                                com.example.budgetdeluminator.utils.DateUtils.getCurrentMonthStart()
+                        val monthEnd =
+                                com.example.budgetdeluminator.utils.DateUtils.getCurrentMonthEnd()
+                        categories.sumOf { category ->
+                                expenseDao.getTotalSpentByCategoryInDateRange(
+                                        category.id,
+                                        monthStart,
+                                        monthEnd
+                                )
+                                        ?: 0.0
+                        }
+                }
+
+        suspend fun getTotalSpentByCategoryForMonth(
+                categoryId: Long,
+                year: Int,
+                month: Int
+        ): Double =
+                withContext(Dispatchers.IO) {
+                        val monthStart =
+                                com.example.budgetdeluminator.utils.DateUtils.getMonthStart(
+                                        year,
+                                        month
+                                )
+                        val monthEnd =
+                                com.example.budgetdeluminator.utils.DateUtils.getMonthEnd(
+                                        year,
+                                        month
+                                )
+                        expenseDao.getTotalSpentByCategoryInDateRange(
+                                categoryId,
+                                monthStart,
+                                monthEnd
+                        )
+                                ?: 0.0
+                }
+
+        suspend fun getAvailableMonths(): List<Pair<Int, Int>> =
+                withContext(Dispatchers.IO) {
+                        val expenseDates = expenseDao.getAllExpenseDates()
+                        val months = mutableSetOf<Pair<Int, Int>>()
+
+                        expenseDates.forEach { timestamp ->
+                                val calendar = Calendar.getInstance()
+                                calendar.timeInMillis = timestamp
+                                val month = calendar.get(Calendar.MONTH)
+                                val year = calendar.get(Calendar.YEAR)
+                                months.add(Pair(month, year))
+                        }
+
+                        // Sort by year and month (most recent first)
+                        months.sortedWith(
+                                compareByDescending<Pair<Int, Int>> { it.second }.thenByDescending {
+                                        it.first
+                                }
+                        )
                 }
 }

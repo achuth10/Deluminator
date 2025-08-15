@@ -4,8 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -28,10 +26,33 @@ import com.example.budgetdeluminator.ui.expenses.AllExpensesFragment
 import com.example.budgetdeluminator.ui.expenses.ExpensesViewModel
 import com.example.budgetdeluminator.ui.home.HomeFragment
 import com.example.budgetdeluminator.ui.home.HomeViewModel
+import com.example.budgetdeluminator.utils.Calculator
+import com.example.budgetdeluminator.utils.Constants
 import com.example.budgetdeluminator.utils.CurrencyPreferences
+import com.example.budgetdeluminator.utils.ErrorHandler
+import com.example.budgetdeluminator.utils.ValidationResult
+import com.example.budgetdeluminator.utils.ValidationUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
+/**
+ * Main activity of the Budget Deluminator app.
+ *
+ * This activity serves as the primary container for the app's navigation and core functionality. It
+ * implements a bottom navigation pattern with three main sections:
+ * - Home: Overview of budget categories and spending
+ * - All Expenses: Comprehensive list of all expenses
+ * - Categories: Management of budget categories
+ *
+ * Key features:
+ * - Professional calculator with edge case handling
+ * - Material Design 3 components with neumorphic design elements
+ * - Comprehensive input validation and error handling
+ * - Offline-first architecture with Room database
+ *
+ * @author Budget Deluminator Team
+ * @version 1.0
+ */
 class MainActivity :
         AppCompatActivity(),
         HomeFragment.OnCategoryClickListener,
@@ -43,7 +64,7 @@ class MainActivity :
     private val categoriesViewModel: CategoriesViewModel by viewModels()
     private val expensesViewModel: ExpensesViewModel by viewModels()
     private lateinit var currencyPreferences: CurrencyPreferences
-    private val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.US)
+    private val dateFormat = SimpleDateFormat(Constants.DATE_FORMAT_DISPLAY, Locale.US)
 
     private lateinit var homeFragment: HomeFragment
     private lateinit var allExpensesFragment: AllExpensesFragment
@@ -55,17 +76,13 @@ class MainActivity :
         setContentView(binding.root)
 
         currencyPreferences = CurrencyPreferences(this)
-        setupToolbar()
+
         setupFragments()
         setupBottomNavigation()
         setupClickListeners()
 
         // Add default categories if database is empty
         addDefaultCategoriesIfNeeded()
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
     }
 
     private fun setupFragments() {
@@ -97,7 +114,7 @@ class MainActivity :
                 }
                 R.id.nav_categories -> {
                     replaceFragment(categoriesFragment)
-                    supportActionBar?.title = "Manage Categories"
+                    supportActionBar?.title = "Categories"
                     binding.fabAddExpense.hide()
                     true
                 }
@@ -118,26 +135,14 @@ class MainActivity :
 
     private fun setupClickListeners() {
         binding.fabAddExpense.setOnClickListener { startExpenseEntryFlow() }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.toolbar_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> {
-                startActivity(
-                        Intent(
-                                this,
-                                com.example.budgetdeluminator.ui.settings.SettingsActivity::class
-                                        .java
-                        )
-                )
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+        binding.fabAddExpense.setOnLongClickListener {
+            startActivity(
+                    Intent(
+                            this,
+                            com.example.budgetdeluminator.ui.settings.SettingsActivity::class.java
+                    )
+            )
+            true
         }
     }
 
@@ -153,133 +158,74 @@ class MainActivity :
         showCalculatorDialog(null)
     }
 
+    /**
+     * Shows the professional calculator dialog for expense amount entry.
+     *
+     * Features:
+     * - Handles division by zero and other arithmetic edge cases
+     * - Supports chained calculations
+     * - Proper error handling and validation
+     * - Material Design 3 styling
+     *
+     * @param preselectedCategory Optional category to pre-select after amount entry
+     */
     private fun showCalculatorDialog(preselectedCategory: BudgetCategory?) {
         val dialogBinding = DialogCalculatorBinding.inflate(LayoutInflater.from(this))
-        var currentDisplay = "0"
-        var expressionDisplay = ""
-        var storedValue = 0.0
-        var currentOperator: String? = null
-        var waitingForOperand = true
-        var justCalculated = false
+        val calculator = Calculator()
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
 
         fun updateDisplay() {
-            dialogBinding.tvCalculatorDisplay.text = currentDisplay
-            dialogBinding.tvCalculatorExpression.text = expressionDisplay
-        }
+            val state = calculator.getState()
+            dialogBinding.tvCalculatorDisplay.text = state.display
+            dialogBinding.tvCalculatorExpression.text = state.expression
 
-        fun getCurrentValue(): Double {
-            return currentDisplay.toDoubleOrNull() ?: 0.0
+            // Show error state with appropriate styling
+            if (state.hasError) {
+                dialogBinding.tvCalculatorDisplay.setTextColor(getColor(R.color.error_color))
+                Toast.makeText(this@MainActivity, state.errorMessage, Toast.LENGTH_SHORT).show()
+            } else {
+                dialogBinding.tvCalculatorDisplay.setTextColor(
+                        getColor(R.color.md_theme_light_onBackground)
+                )
+            }
         }
 
         fun addNumber(number: String) {
-            if (waitingForOperand || currentDisplay == "0" || justCalculated) {
-                currentDisplay = number
-                waitingForOperand = false
-                if (justCalculated) {
-                    // Starting fresh after calculation
-                    expressionDisplay = ""
-                    justCalculated = false
-                }
-            } else {
-                currentDisplay += number
-            }
+            calculator.addDigit(number)
             updateDisplay()
         }
 
         fun addDecimal() {
-            if (waitingForOperand || justCalculated) {
-                currentDisplay = "0."
-                waitingForOperand = false
-                if (justCalculated) {
-                    expressionDisplay = ""
-                    justCalculated = false
-                }
-            } else if (!currentDisplay.contains(".")) {
-                currentDisplay += "."
-            }
+            calculator.addDecimal()
+            updateDisplay()
+        }
+
+        fun addOperator(op: String) {
+            val operation =
+                    when (op) {
+                        "+" -> Calculator.Operation.ADD
+                        "-" -> Calculator.Operation.SUBTRACT
+                        "×" -> Calculator.Operation.MULTIPLY
+                        "÷" -> Calculator.Operation.DIVIDE
+                        else -> Calculator.Operation.NONE
+                    }
+            calculator.setOperation(operation)
             updateDisplay()
         }
 
         fun performCalculation() {
-            if (currentOperator != null && !waitingForOperand) {
-                val currentValue = getCurrentValue()
-
-                // Add the current number to the expression
-                expressionDisplay += currentDisplay
-
-                val result =
-                        when (currentOperator) {
-                            "+" -> storedValue + currentValue
-                            "-" -> storedValue - currentValue
-                            "×" -> storedValue * currentValue
-                            "÷" ->
-                                    if (currentValue != 0.0) storedValue / currentValue
-                                    else storedValue
-                            else -> currentValue
-                        }
-
-                currentDisplay =
-                        if (result == result.toLong().toDouble()) {
-                            result.toLong().toString()
-                        } else {
-                            String.format("%.2f", result)
-                        }
-
-                storedValue = result
-                currentOperator = null
-                waitingForOperand = true
-                justCalculated = true
-                updateDisplay()
-            }
-        }
-
-        fun addOperator(op: String) {
-            val currentValue = getCurrentValue()
-
-            if (currentOperator != null && !waitingForOperand) {
-                // Chain calculation: perform previous operation first
-                performCalculation()
-                // After calculation, add the new operator to expression
-                expressionDisplay += " $op "
-            } else {
-                storedValue = currentValue
-                // Start or continue building expression
-                if (expressionDisplay.isEmpty()) {
-                    expressionDisplay = currentDisplay
-                }
-                expressionDisplay += " $op "
-            }
-
-            currentOperator = op
-            waitingForOperand = true
-            justCalculated = false
+            calculator.calculate()
             updateDisplay()
         }
 
         fun backspace() {
-            if (!waitingForOperand && currentDisplay.length > 1) {
-                currentDisplay = currentDisplay.dropLast(1)
-                if (currentDisplay.isEmpty() || currentDisplay == "-") {
-                    currentDisplay = "0"
-                    waitingForOperand = true
-                }
-            } else {
-                currentDisplay = "0"
-                waitingForOperand = true
-            }
-            justCalculated = false
+            calculator.backspace()
             updateDisplay()
         }
 
         fun clear() {
-            currentDisplay = "0"
-            expressionDisplay = ""
-            storedValue = 0.0
-            currentOperator = null
-            waitingForOperand = true
-            justCalculated = false
+            calculator.clear()
             updateDisplay()
         }
 
@@ -311,21 +257,36 @@ class MainActivity :
         dialogBinding.btnCancelCalculator.setOnClickListener { dialog.dismiss() }
 
         dialogBinding.btnOkayCalculator.setOnClickListener {
-            // If there's a pending operation, complete it first
-            if (currentOperator != null && !waitingForOperand) {
-                performCalculation()
+            val state = calculator.getState()
+
+            if (state.hasError) {
+                Toast.makeText(this, "Please fix the error first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Perform any pending calculation before getting the final value
+            if (state.currentOperation != Calculator.Operation.NONE && !state.waitingForOperand) {
+                calculator.calculate()
             }
 
             // Get the final calculated value
-            val finalValue = getCurrentValue()
+            val finalValue = calculator.getCurrentValue()
 
             if (finalValue > 0) {
                 dialog.dismiss()
                 showExpenseFormDialog(finalValue, preselectedCategory)
             } else {
-                Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                                this,
+                                "Please enter a valid amount greater than 0",
+                                Toast.LENGTH_SHORT
+                        )
+                        .show()
             }
         }
+
+        // Initialize display
+        updateDisplay()
 
         dialog.show()
     }
@@ -335,130 +296,80 @@ class MainActivity :
             onAmountSelected: (Double) -> Unit
     ) {
         val dialogBinding = DialogCalculatorBinding.inflate(LayoutInflater.from(this))
-        var currentDisplay = initialAmount.toString()
-        var expressionDisplay = ""
-        var storedValue = 0.0
-        var currentOperator: String? = null
-        var waitingForOperand = true
-        var justCalculated = false
+        val calculator = Calculator()
+
+        // Set initial amount if greater than 0
+        if (initialAmount > 0) {
+            val initialStr =
+                    if (initialAmount == initialAmount.toLong().toDouble()) {
+                        initialAmount.toLong().toString()
+                    } else {
+                        initialAmount.toString()
+                    }
+            // Input the initial amount digit by digit
+            initialStr.forEach { char ->
+                when (char) {
+                    '.' -> calculator.addDecimal()
+                    in '0'..'9' -> calculator.addDigit(char.toString())
+                }
+            }
+        }
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
 
         fun updateDisplay() {
-            dialogBinding.tvCalculatorDisplay.text = currentDisplay
-            dialogBinding.tvCalculatorExpression.text = expressionDisplay
-        }
+            val state = calculator.getState()
+            dialogBinding.tvCalculatorDisplay.text = state.display
+            dialogBinding.tvCalculatorExpression.text = state.expression
 
-        fun getCurrentValue(): Double {
-            return currentDisplay.toDoubleOrNull() ?: 0.0
+            // Show error state with appropriate styling
+            if (state.hasError) {
+                dialogBinding.tvCalculatorDisplay.setTextColor(getColor(R.color.error_color))
+                Toast.makeText(this@MainActivity, state.errorMessage, Toast.LENGTH_SHORT).show()
+            } else {
+                dialogBinding.tvCalculatorDisplay.setTextColor(
+                        getColor(R.color.md_theme_light_onBackground)
+                )
+            }
         }
 
         fun addNumber(number: String) {
-            if (waitingForOperand || currentDisplay == "0" || justCalculated) {
-                currentDisplay = number
-                waitingForOperand = false
-                if (justCalculated) {
-                    expressionDisplay = ""
-                    justCalculated = false
-                }
-            } else {
-                currentDisplay += number
-            }
+            calculator.addDigit(number)
             updateDisplay()
         }
 
         fun addDecimal() {
-            if (waitingForOperand || justCalculated) {
-                currentDisplay = "0."
-                waitingForOperand = false
-                if (justCalculated) {
-                    expressionDisplay = ""
-                    justCalculated = false
-                }
-            } else if (!currentDisplay.contains(".")) {
-                currentDisplay += "."
-            }
+            calculator.addDecimal()
+            updateDisplay()
+        }
+
+        fun addOperator(op: String) {
+            val operation =
+                    when (op) {
+                        "+" -> Calculator.Operation.ADD
+                        "-" -> Calculator.Operation.SUBTRACT
+                        "×" -> Calculator.Operation.MULTIPLY
+                        "÷" -> Calculator.Operation.DIVIDE
+                        else -> Calculator.Operation.NONE
+                    }
+            calculator.setOperation(operation)
             updateDisplay()
         }
 
         fun performCalculation() {
-            if (currentOperator != null && !waitingForOperand) {
-                val currentValue = getCurrentValue()
-                expressionDisplay += currentDisplay
-
-                val result =
-                        when (currentOperator) {
-                            "+" -> storedValue + currentValue
-                            "-" -> storedValue - currentValue
-                            "×" -> storedValue * currentValue
-                            "÷" ->
-                                    if (currentValue != 0.0) storedValue / currentValue
-                                    else storedValue
-                            else -> currentValue
-                        }
-
-                currentDisplay =
-                        if (result == result.toLong().toDouble()) {
-                            result.toLong().toString()
-                        } else {
-                            String.format("%.2f", result)
-                        }
-
-                storedValue = result
-                currentOperator = null
-                waitingForOperand = true
-                justCalculated = true
-                updateDisplay()
-            }
-        }
-
-        fun addOperator(op: String) {
-            val currentValue = getCurrentValue()
-
-            if (currentOperator != null && !waitingForOperand) {
-                performCalculation()
-                expressionDisplay += " $op "
-            } else {
-                storedValue = currentValue
-                if (expressionDisplay.isEmpty()) {
-                    expressionDisplay = currentDisplay
-                }
-                expressionDisplay += " $op "
-            }
-
-            currentOperator = op
-            waitingForOperand = true
-            justCalculated = false
+            calculator.calculate()
             updateDisplay()
         }
 
         fun backspace() {
-            if (!waitingForOperand && currentDisplay.length > 1) {
-                currentDisplay = currentDisplay.dropLast(1)
-                if (currentDisplay.isEmpty() || currentDisplay == "-") {
-                    currentDisplay = "0"
-                    waitingForOperand = true
-                }
-            } else {
-                currentDisplay = "0"
-                waitingForOperand = true
-            }
-            justCalculated = false
+            calculator.backspace()
             updateDisplay()
         }
 
         fun clear() {
-            currentDisplay = "0"
-            expressionDisplay = ""
-            storedValue = 0.0
-            currentOperator = null
-            waitingForOperand = true
-            justCalculated = false
+            calculator.clear()
             updateDisplay()
         }
-
-        // Initialize display with initial amount
-        updateDisplay()
 
         // Set up number buttons
         dialogBinding.btn0.setOnClickListener { addNumber("0") }
@@ -488,18 +399,34 @@ class MainActivity :
         dialogBinding.btnCancelCalculator.setOnClickListener { dialog.dismiss() }
 
         dialogBinding.btnOkayCalculator.setOnClickListener {
-            if (currentOperator != null && !waitingForOperand) {
-                performCalculation()
+            val state = calculator.getState()
+
+            if (state.hasError) {
+                Toast.makeText(this, "Please fix the error first", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
-            val finalValue = getCurrentValue()
+            // Perform any pending calculation before getting the final value
+            if (state.currentOperation != Calculator.Operation.NONE && !state.waitingForOperand) {
+                calculator.calculate()
+            }
+
+            val finalValue = calculator.getCurrentValue()
             if (finalValue > 0) {
                 dialog.dismiss()
                 onAmountSelected(finalValue)
             } else {
-                Toast.makeText(this, "Please enter a valid amount", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                                this,
+                                "Please enter a valid amount greater than 0",
+                                Toast.LENGTH_SHORT
+                        )
+                        .show()
             }
         }
+
+        // Initialize display
+        updateDisplay()
 
         dialog.show()
     }
@@ -508,6 +435,19 @@ class MainActivity :
         showExpenseFormDialog(amount, null)
     }
 
+    /**
+     * Shows the expense form dialog for creating new expenses.
+     *
+     * Features:
+     * - Comprehensive input validation
+     * - Date picker with smart defaults (Today/Yesterday)
+     * - Category selection with quick access
+     * - Amount editing via calculator
+     * - Proper error handling and user feedback
+     *
+     * @param amount The expense amount (validated)
+     * @param preselectedCategory Optional pre-selected category
+     */
     private fun showExpenseFormDialog(amount: Double, preselectedCategory: BudgetCategory?) {
         val dialogBinding = DialogAddExpenseBinding.inflate(LayoutInflater.from(this))
         var selectedCategory: BudgetCategory? = preselectedCategory
@@ -555,21 +495,77 @@ class MainActivity :
 
         // Save button
         dialogBinding.btnSaveExpense.setOnClickListener {
-            selectedCategory?.let { category ->
-                val description = dialogBinding.etExpenseNote.text.toString().trim()
-                val expense =
-                        Expense(
-                                categoryId = category.id,
-                                amount = amount,
-                                description = description,
-                                createdAt = selectedDate
-                        )
-                expensesViewModel.insertExpense(expense)
-                dialog.dismiss()
-            }
-                    ?: run {
-                        Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
+            ErrorHandler.safeExecute(this, dialogBinding.root, "Failed to save expense") {
+                selectedCategory?.let { category ->
+                    val description =
+                            ValidationUtils.sanitizeInput(
+                                    dialogBinding.etExpenseNote.text.toString()
+                            )
+
+                    // Validate all inputs
+                    val amountValidation = ValidationUtils.validateExpenseAmount(amount)
+                    val descriptionValidation =
+                            ValidationUtils.validateExpenseDescription(description)
+                    val dateValidation = ValidationUtils.validateExpenseDate(selectedDate)
+
+                    when {
+                        !amountValidation.isSuccess() -> {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    amountValidation,
+                                    dialogBinding.root
+                            )
+                        }
+                        !descriptionValidation.isSuccess() -> {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    descriptionValidation,
+                                    dialogBinding.root
+                            )
+                            dialogBinding.etExpenseNote.error =
+                                    descriptionValidation.getErrorMessage()
+                        }
+                        !dateValidation.isSuccess() -> {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    dateValidation,
+                                    dialogBinding.root
+                            )
+                        }
+                        else -> {
+                            val expense =
+                                    Expense(
+                                            categoryId = category.id,
+                                            amount = amount,
+                                            description = description,
+                                            createdAt = selectedDate
+                                    )
+
+                            ErrorHandler.safeDatabaseExecute(
+                                    this,
+                                    "saving expense",
+                                    dialogBinding.root
+                            ) {
+                                expensesViewModel.insertExpense(expense)
+                                dialog.dismiss()
+                                Toast.makeText(
+                                                this,
+                                                Constants.SUCCESS_EXPENSE_SAVED,
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                            }
+                        }
                     }
+                }
+                        ?: run {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    ValidationResult.Error("Please select a category"),
+                                    dialogBinding.root
+                            )
+                        }
+            }
         }
 
         // Set preselected category or auto-select first category if available
@@ -652,7 +648,7 @@ class MainActivity :
             dialog.dismiss()
             // Navigate to categories fragment
             replaceFragment(categoriesFragment)
-            supportActionBar?.title = "Manage Categories"
+            supportActionBar?.title = "Categories"
             binding.bottomNavigation.selectedItemId = R.id.nav_categories
             binding.fabAddExpense.hide()
         }
@@ -712,31 +708,92 @@ class MainActivity :
 
         // Save button
         dialogBinding.btnSaveExpense.setOnClickListener {
-            selectedCategory?.let { category ->
-                val description = dialogBinding.etExpenseNote.text.toString().trim()
-                val amountText = dialogBinding.tvExpenseAmount.text.toString()
+            ErrorHandler.safeExecute(this, dialogBinding.root, "Failed to update expense") {
+                selectedCategory?.let { category ->
+                    val description =
+                            ValidationUtils.sanitizeInput(
+                                    dialogBinding.etExpenseNote.text.toString()
+                            )
+                    val amountText = dialogBinding.tvExpenseAmount.text.toString()
 
-                // Extract amount from formatted text
-                val amount =
-                        try {
-                            currencyPreferences.parseAmount(amountText)
-                        } catch (e: Exception) {
-                            expense.amount // fallback to original amount if parsing fails
+                    // Extract and validate amount
+                    val amount =
+                            try {
+                                currencyPreferences.parseAmount(amountText)
+                            } catch (e: Exception) {
+                                ErrorHandler.handleError(
+                                        this,
+                                        e,
+                                        "Invalid amount format",
+                                        dialogBinding.root
+                                )
+                                return@safeExecute
+                            }
+
+                    // Validate all inputs
+                    val amountValidation = ValidationUtils.validateExpenseAmount(amount)
+                    val descriptionValidation =
+                            ValidationUtils.validateExpenseDescription(description)
+                    val dateValidation = ValidationUtils.validateExpenseDate(selectedDate)
+
+                    when {
+                        !amountValidation.isSuccess() -> {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    amountValidation,
+                                    dialogBinding.root
+                            )
                         }
+                        !descriptionValidation.isSuccess() -> {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    descriptionValidation,
+                                    dialogBinding.root
+                            )
+                            dialogBinding.etExpenseNote.error =
+                                    descriptionValidation.getErrorMessage()
+                        }
+                        !dateValidation.isSuccess() -> {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    dateValidation,
+                                    dialogBinding.root
+                            )
+                        }
+                        else -> {
+                            val updatedExpense =
+                                    expense.copy(
+                                            categoryId = category.id,
+                                            amount = amount,
+                                            description = description,
+                                            createdAt = selectedDate
+                                    )
 
-                val updatedExpense =
-                        expense.copy(
-                                categoryId = category.id,
-                                amount = amount,
-                                description = description,
-                                createdAt = selectedDate
-                        )
-                expensesViewModel.updateExpense(updatedExpense)
-                dialog.dismiss()
-            }
-                    ?: run {
-                        Toast.makeText(this, "Please select a category", Toast.LENGTH_SHORT).show()
+                            ErrorHandler.safeDatabaseExecute(
+                                    this,
+                                    "updating expense",
+                                    dialogBinding.root
+                            ) {
+                                expensesViewModel.updateExpense(updatedExpense)
+                                dialog.dismiss()
+                                Toast.makeText(
+                                                this,
+                                                Constants.SUCCESS_EXPENSE_UPDATED,
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                            }
+                        }
                     }
+                }
+                        ?: run {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    ValidationResult.Error("Please select a category"),
+                                    dialogBinding.root
+                            )
+                        }
+            }
         }
 
         dialog.show()
@@ -787,8 +844,16 @@ class MainActivity :
     private fun showDeleteExpenseDialog(expense: Expense) {
         AlertDialog.Builder(this)
                 .setTitle("Delete Expense")
-                .setMessage("Are you sure you want to delete this expense?")
-                .setPositiveButton("Delete") { _, _ -> expensesViewModel.deleteExpense(expense) }
+                .setMessage(
+                        "Are you sure you want to delete this expense? This action cannot be undone."
+                )
+                .setPositiveButton("Delete") { _, _ ->
+                    ErrorHandler.safeDatabaseExecute(this, "deleting expense") {
+                        expensesViewModel.deleteExpense(expense)
+                        Toast.makeText(this, Constants.SUCCESS_EXPENSE_DELETED, Toast.LENGTH_SHORT)
+                                .show()
+                    }
+                }
                 .setNegativeButton("Cancel", null)
                 .show()
     }
@@ -802,48 +867,13 @@ class MainActivity :
                         if (value.isEmpty()) {
                             // Add comprehensive default categories with appropriate colors
                             val defaultCategories =
-                                    listOf(
-                                            BudgetCategory(
-                                                    name = "Food & Dining",
-                                                    budgetLimit = 500.0,
-                                                    color = "#4CAF50" // Green
-                                            ),
-                                            BudgetCategory(
-                                                    name = "Transportation",
-                                                    budgetLimit = 300.0,
-                                                    color = "#2196F3" // Blue
-                                            ),
-                                            BudgetCategory(
-                                                    name = "Shopping",
-                                                    budgetLimit = 400.0,
-                                                    color = "#FF9800" // Orange
-                                            ),
-                                            BudgetCategory(
-                                                    name = "Entertainment",
-                                                    budgetLimit = 200.0,
-                                                    color = "#E91E63" // Pink
-                                            ),
-                                            BudgetCategory(
-                                                    name = "Bills & Utilities",
-                                                    budgetLimit = 800.0,
-                                                    color = "#9C27B0" // Purple
-                                            ),
-                                            BudgetCategory(
-                                                    name = "Healthcare",
-                                                    budgetLimit = 300.0,
-                                                    color = "#FF5722" // Red
-                                            ),
-                                            BudgetCategory(
-                                                    name = "Personal Care",
-                                                    budgetLimit = 150.0,
-                                                    color = "#00BCD4" // Teal
-                                            ),
-                                            BudgetCategory(
-                                                    name = "Education",
-                                                    budgetLimit = 250.0,
-                                                    color = "#3F51B5" // Indigo
-                                            )
-                                    )
+                                    Constants.DEFAULT_CATEGORIES.map { defaultCategory ->
+                                        BudgetCategory(
+                                                name = defaultCategory.name,
+                                                budgetLimit = defaultCategory.budgetLimit,
+                                                color = defaultCategory.color
+                                        )
+                                    }
 
                             defaultCategories.forEach { category ->
                                 categoriesViewModel.insertCategory(category)
@@ -868,8 +898,16 @@ class MainActivity :
     override fun onExpenseDeleteRequested(expense: Expense) {
         androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Delete Expense")
-                .setMessage("Are you sure you want to delete this expense?")
-                .setPositiveButton("Delete") { _, _ -> expensesViewModel.deleteExpense(expense) }
+                .setMessage(
+                        "Are you sure you want to delete this expense? This action cannot be undone."
+                )
+                .setPositiveButton("Delete") { _, _ ->
+                    ErrorHandler.safeDatabaseExecute(this, "deleting expense") {
+                        expensesViewModel.deleteExpense(expense)
+                        Toast.makeText(this, Constants.SUCCESS_EXPENSE_DELETED, Toast.LENGTH_SHORT)
+                                .show()
+                    }
+                }
                 .setNegativeButton("Cancel", null)
                 .show()
     }

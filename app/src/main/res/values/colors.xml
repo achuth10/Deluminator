@@ -36,4 +36,32 @@
     <!-- Progress Colors -->
     <color name="progress_background_light">#FFE0E0E0</color>
     <color name="progress_background_dark">#FF424242</color>
+    
+    <!-- Material Design 3 Light Theme Colors -->
+    <color name="md_theme_light_primary">#FF6750A4</color>
+    <color name="md_theme_light_onPrimary">#FFFFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#FFEADDFF</color>
+    <color name="md_theme_light_onPrimaryContainer">#FF21005D</color>
+    <color name="md_theme_light_surface">#FFFFFBFE</color>
+    <color name="md_theme_light_onSurface">#FF1C1B1F</color>
+    <color name="md_theme_light_surfaceVariant">#FFE7E0EC</color>
+    <color name="md_theme_light_onSurfaceVariant">#FF49454F</color>
+    <color name="md_theme_light_surfaceContainer">#FFF3EDF7</color>
+    <color name="md_theme_light_background">#FFFFFBFE</color>
+    <color name="md_theme_light_onBackground">#FF1C1B1F</color>
+    <color name="md_theme_light_outline">#FF79747E</color>
+    
+    <!-- Material Design 3 Dark Theme Colors -->
+    <color name="md_theme_dark_primary">#FFD0BCFF</color>
+    <color name="md_theme_dark_onPrimary">#FF381E72</color>
+    <color name="md_theme_dark_primaryContainer">#FF4F378B</color>
+    <color name="md_theme_dark_onPrimaryContainer">#FFEADDFF</color>
+    <color name="md_theme_dark_surface">#FF141218</color>
+    <color name="md_theme_dark_onSurface">#FFE6E1E5</color>
+    <color name="md_theme_dark_surfaceVariant">#FF49454F</color>
+    <color name="md_theme_dark_onSurfaceVariant">#FFCAC4D0</color>
+    <color name="md_theme_dark_surfaceContainer">#FF211F26</color>
+    <color name="md_theme_dark_background">#FF141218</color>
+    <color name="md_theme_dark_onBackground">#FFE6E1E5</color>
+    <color name="md_theme_dark_outline">#FF938F99</color>
 </resources>

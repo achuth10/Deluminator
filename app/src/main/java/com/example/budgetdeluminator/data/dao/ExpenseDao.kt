@@ -8,28 +8,49 @@ import com.example.budgetdeluminator.data.model.ExpenseWithCategory
 @Dao
 interface ExpenseDao {
 
-    @Query("SELECT * FROM expenses ORDER BY createdAt DESC")
-    fun getAllExpenses(): LiveData<List<Expense>>
+        @Query("SELECT * FROM expenses ORDER BY createdAt DESC")
+        fun getAllExpenses(): LiveData<List<Expense>>
 
-    @Transaction
-    @Query("SELECT * FROM expenses ORDER BY createdAt DESC")
-    fun getAllExpensesWithCategory(): LiveData<List<ExpenseWithCategory>>
+        @Transaction
+        @Query("SELECT * FROM expenses ORDER BY createdAt DESC")
+        fun getAllExpensesWithCategory(): LiveData<List<ExpenseWithCategory>>
 
-    @Query("SELECT * FROM expenses WHERE categoryId = :categoryId ORDER BY createdAt DESC")
-    fun getExpensesByCategory(categoryId: Long): LiveData<List<Expense>>
+        @Query("SELECT * FROM expenses WHERE categoryId = :categoryId ORDER BY createdAt DESC")
+        fun getExpensesByCategory(categoryId: Long): LiveData<List<Expense>>
 
-    @Query("SELECT SUM(amount) FROM expenses WHERE categoryId = :categoryId")
-    suspend fun getTotalSpentByCategory(categoryId: Long): Double?
+        @Query("SELECT SUM(amount) FROM expenses WHERE categoryId = :categoryId")
+        suspend fun getTotalSpentByCategory(categoryId: Long): Double?
 
-    @Query("SELECT SUM(amount) FROM expenses WHERE categoryId = :categoryId")
-    fun getTotalSpentByCategoryLive(categoryId: Long): LiveData<Double?>
+        @Query(
+                "SELECT SUM(amount) FROM expenses WHERE categoryId = :categoryId AND createdAt >= :startDate AND createdAt <= :endDate"
+        )
+        suspend fun getTotalSpentByCategoryInDateRange(
+                categoryId: Long,
+                startDate: Long,
+                endDate: Long
+        ): Double?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertExpense(expense: Expense): Long
+        @Query("SELECT SUM(amount) FROM expenses WHERE categoryId = :categoryId")
+        fun getTotalSpentByCategoryLive(categoryId: Long): LiveData<Double?>
 
-    @Update suspend fun updateExpense(expense: Expense)
+        @Query(
+                "SELECT SUM(amount) FROM expenses WHERE categoryId = :categoryId AND createdAt >= :startDate AND createdAt <= :endDate"
+        )
+        fun getTotalSpentByCategoryInDateRangeLive(
+                categoryId: Long,
+                startDate: Long,
+                endDate: Long
+        ): LiveData<Double?>
 
-    @Delete suspend fun deleteExpense(expense: Expense)
+        @Insert(onConflict = OnConflictStrategy.REPLACE)
+        suspend fun insertExpense(expense: Expense): Long
 
-    @Query("DELETE FROM expenses WHERE id = :id") suspend fun deleteExpenseById(id: Long)
+        @Update suspend fun updateExpense(expense: Expense)
+
+        @Delete suspend fun deleteExpense(expense: Expense)
+
+        @Query("DELETE FROM expenses WHERE id = :id") suspend fun deleteExpenseById(id: Long)
+
+        @Query("SELECT DISTINCT createdAt FROM expenses ORDER BY createdAt DESC")
+        suspend fun getAllExpenseDates(): List<Long>
 }

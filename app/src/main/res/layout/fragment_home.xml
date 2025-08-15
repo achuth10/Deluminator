@@ -11,6 +11,48 @@
         android:orientation="vertical"
         android:padding="12dp">
 
+        <!-- Page Title with Month -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_trending_up"
+                android:layout_gravity="center_vertical"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Budget Overview"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="?attr/primaryTextColor"
+                android:gravity="start" />
+
+            <TextView
+                android:id="@+id/chipCurrentMonth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current Month"
+                android:textSize="14sp"
+                android:textColor="?attr/secondaryTextColor"
+                android:background="@drawable/chip_background"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="8dp"
+                android:gravity="center" />
+
+        </LinearLayout>
+
         <!-- Budget Overview Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/NeumorphicCardStyle"
@@ -25,28 +67,7 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/ic_trending_up"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginEnd="8dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Budget Overview"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="?attr/primaryTextColor" />
-
-                </LinearLayout>
 
                 <!-- Budget Summary - Horizontal Layout -->
                 <LinearLayout
@@ -168,3 +189,4 @@
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
+
