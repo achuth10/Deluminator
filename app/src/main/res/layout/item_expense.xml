@@ -53,7 +53,7 @@
                 android:layout_weight="1"
                 android:text="$25.50"
                 android:textStyle="bold"
-                android:textColor="@color/error_color"
+                android:textColor="?attr/primaryTextColor"
                 android:layout_marginEnd="8dp"
                 android:maxLines="1"
                 android:gravity="end"

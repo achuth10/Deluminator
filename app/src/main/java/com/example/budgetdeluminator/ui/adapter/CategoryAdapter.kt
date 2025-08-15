@@ -3,7 +3,6 @@ package com.example.budgetdeluminator.ui.adapter
 import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -39,42 +38,34 @@ class CategoryAdapter(
             val remaining = categoryWithExpenses.remainingBudget
             val percentage = categoryWithExpenses.budgetPercentage
             val isOverBudget = categoryWithExpenses.isOverBudget
-            val isApproachingLimit = percentage >= 80.0 // Warning threshold
 
             binding.apply {
                 tvCategoryName.text = category.name
                 tvSpentAmount.text = currencyPreferences.formatAmount(totalSpent)
-                tvBudgetLimit.text = currencyPreferences.formatAmount(category.budgetLimit)
 
-                // Set remaining amount and color
-                tvRemainingAmount.text =
-                        if (isOverBudget) {
-                            "${currencyPreferences.formatAmount(Math.abs(remaining))} over"
-                        } else {
-                            "${currencyPreferences.formatAmount(remaining)} left"
-                        }
-
+                // Set remaining amount with proper color using three-color system
+                tvRemainingAmount.text = currencyPreferences.formatAmount(remaining)
                 tvRemainingAmount.setTextColor(
-                        if (isOverBudget) Color.parseColor("#F44336") // Red
-                        else Color.parseColor("#4CAF50") // Green
+                        when {
+                            isOverBudget -> Color.parseColor("#F44336") // Red for over budget
+                            percentage >= 80.0 ->
+                                    Color.parseColor("#FF9800") // Orange/Yellow for warning
+                            else -> Color.parseColor("#4CAF50") // Green for normal
+                        }
                 )
 
-                // Set progress bar
+                // Set progress bar with three-color system
                 progressBarCategory.progress = percentage.toInt().coerceAtMost(100)
                 progressBarCategory.progressTintList =
                         android.content.res.ColorStateList.valueOf(
-                                if (isOverBudget) Color.parseColor("#F44336") // Red
-                                else Color.parseColor("#4CAF50") // Green
+                                when {
+                                    isOverBudget ->
+                                            Color.parseColor("#F44336") // Red for over budget
+                                    percentage >= 80.0 ->
+                                            Color.parseColor("#FF9800") // Orange/Yellow for warning
+                                    else -> Color.parseColor("#4CAF50") // Green for normal
+                                }
                         )
-
-                // Show/hide warning elements
-                if (isApproachingLimit && !isOverBudget) {
-                    viewWarningIndicator.visibility = View.VISIBLE
-                    tvWarningText.visibility = View.VISIBLE
-                } else {
-                    viewWarningIndicator.visibility = View.GONE
-                    tvWarningText.visibility = View.GONE
-                }
 
                 // Set click listeners
                 root.setOnClickListener { onCategoryClick(categoryWithExpenses) }

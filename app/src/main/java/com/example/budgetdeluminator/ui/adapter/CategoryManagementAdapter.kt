@@ -1,5 +1,6 @@
 package com.example.budgetdeluminator.ui.adapter
 
+import android.content.Context
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,10 +9,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.databinding.ItemCategoryManagementBinding
-import java.text.NumberFormat
-import java.util.*
+import com.example.budgetdeluminator.utils.CurrencyPreferences
 
 class CategoryManagementAdapter(
+        private val context: Context,
         private val onEditClick: (BudgetCategory) -> Unit,
         private val onDeleteClick: (BudgetCategory) -> Unit
 ) :
@@ -19,7 +20,7 @@ class CategoryManagementAdapter(
                 CategoryDiffCallback()
         ) {
 
-    private val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
+    private val currencyPreferences = CurrencyPreferences(context)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding =
@@ -41,7 +42,8 @@ class CategoryManagementAdapter(
         fun bind(category: BudgetCategory) {
             binding.apply {
                 tvCategoryName.text = category.name
-                tvBudgetLimit.text = "Budget: ${currencyFormat.format(category.budgetLimit)}"
+                tvBudgetLimit.text =
+                        "Budget: ${currencyPreferences.formatAmount(category.budgetLimit)}"
 
                 // Set card background color based on category color
                 try {

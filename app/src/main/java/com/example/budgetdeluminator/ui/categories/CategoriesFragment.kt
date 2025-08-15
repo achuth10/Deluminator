@@ -17,218 +17,234 @@ import com.example.budgetdeluminator.ui.adapter.CategoryManagementAdapter
 
 class CategoriesFragment : Fragment() {
 
-    private var _binding: FragmentCategoriesBinding? = null
-    private val binding
-        get() = _binding!!
+        private var _binding: FragmentCategoriesBinding? = null
+        private val binding
+                get() = _binding!!
 
-    private lateinit var categoryAdapter: CategoryManagementAdapter
-    private val categoriesViewModel: CategoriesViewModel by viewModels()
+        private lateinit var categoryAdapter: CategoryManagementAdapter
+        private val categoriesViewModel: CategoriesViewModel by viewModels()
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentCategoriesBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setupRecyclerView()
-        setupObservers()
-        setupClickListeners()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-
-    private fun setupRecyclerView() {
-        categoryAdapter =
-                CategoryManagementAdapter(
-                        onEditClick = { category -> showAddCategoryDialog(category) },
-                        onDeleteClick = { category -> showDeleteCategoryDialog(category) }
-                )
-
-        binding.recyclerViewCategories.apply {
-            adapter = categoryAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-        }
-    }
-
-    private fun setupObservers() {
-        categoriesViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
-            categoryAdapter.submitList(categories)
+        override fun onCreateView(
+                inflater: LayoutInflater,
+                container: ViewGroup?,
+                savedInstanceState: Bundle?
+        ): View {
+                _binding = FragmentCategoriesBinding.inflate(inflater, container, false)
+                return binding.root
         }
 
-        // Fix any existing categories with missing colors
-        categoriesViewModel.fixMissingColors()
-    }
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+                super.onViewCreated(view, savedInstanceState)
 
-    private fun setupClickListeners() {
-        binding.fabAddCategory.setOnClickListener { showAddCategoryDialog() }
-    }
-
-    private fun showAddCategoryDialog(categoryToEdit: BudgetCategory? = null) {
-        val dialogBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(requireContext()))
-
-        // Available color options
-        val colorOptions =
-                arrayOf(
-                        "#4CAF50",
-                        "#2196F3",
-                        "#FF9800",
-                        "#E91E63",
-                        "#9C27B0",
-                        "#FF5722",
-                        "#00BCD4",
-                        "#3F51B5",
-                        "#FFC107",
-                        "#795548"
-                )
-        var selectedColor = categoryToEdit?.color?.takeIf { it.isNotEmpty() } ?: "#4CAF50"
-
-        // Pre-fill if editing
-        categoryToEdit?.let { category ->
-            dialogBinding.etCategoryName.setText(category.name)
-            dialogBinding.etBudgetLimit.setText(category.budgetLimit.toString())
-            selectedColor = category.color
+                setupRecyclerView()
+                setupObservers()
+                setupClickListeners()
         }
 
-        // Setup color picker click listeners
-        val colorViews =
-                arrayOf(
-                        dialogBinding.colorOption1,
-                        dialogBinding.colorOption2,
-                        dialogBinding.colorOption3,
-                        dialogBinding.colorOption4,
-                        dialogBinding.colorOption5,
-                        dialogBinding.colorOption6,
-                        dialogBinding.colorOption7,
-                        dialogBinding.colorOption8,
-                        dialogBinding.colorOption9,
-                        dialogBinding.colorOption10
-                )
-
-        // Initialize color selection highlighting
-        updateColorSelection(colorViews, colorOptions, selectedColor)
-
-        colorViews.forEachIndexed { index, colorView ->
-            colorView.setOnClickListener {
-                selectedColor = colorOptions[index]
-                updateColorSelection(colorViews, colorOptions, selectedColor)
-            }
+        override fun onDestroyView() {
+                super.onDestroyView()
+                _binding = null
         }
 
-        val dialog = AlertDialog.Builder(requireContext()).setView(dialogBinding.root).create()
-
-        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
-
-        dialogBinding.btnSave.setOnClickListener {
-            val name = dialogBinding.etCategoryName.text.toString().trim()
-            val budgetLimitText = dialogBinding.etBudgetLimit.text.toString().trim()
-
-            if (name.isEmpty() || budgetLimitText.isEmpty()) {
-                Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT)
-                        .show()
-                return@setOnClickListener
-            }
-
-            val budgetLimit = budgetLimitText.toDoubleOrNull()
-            if (budgetLimit == null || budgetLimit <= 0) {
-                Toast.makeText(
-                                requireContext(),
-                                "Please enter a valid budget amount",
-                                Toast.LENGTH_SHORT
+        private fun setupRecyclerView() {
+                categoryAdapter =
+                        CategoryManagementAdapter(
+                                context = requireContext(),
+                                onEditClick = { category -> showAddCategoryDialog(category) },
+                                onDeleteClick = { category -> showDeleteCategoryDialog(category) }
                         )
-                        .show()
-                return@setOnClickListener
-            }
 
-            if (categoryToEdit == null) {
-                // Adding new category
-                val newCategory =
-                        BudgetCategory(
-                                name = name,
-                                budgetLimit = budgetLimit,
-                                color = selectedColor
-                        )
-                categoriesViewModel.insertCategory(newCategory)
-            } else {
-                // Editing existing category
-                val updatedCategory =
-                        categoryToEdit.copy(
-                                name = name,
-                                budgetLimit = budgetLimit,
-                                color = selectedColor
-                        )
-                categoriesViewModel.updateCategory(updatedCategory)
-            }
-
-            dialog.dismiss()
-        }
-
-        dialog.show()
-    }
-
-    private fun updateColorSelection(
-            colorViews: Array<View>,
-            colorOptions: Array<String>,
-            selectedColor: String
-    ) {
-        colorViews.forEachIndexed { index, colorView ->
-            val isSelected = colorOptions[index] == selectedColor
-            val drawableRes =
-                    when (colorOptions[index]) {
-                        "#4CAF50" ->
-                                if (isSelected) R.drawable.color_circle_green_selected
-                                else R.drawable.color_circle_green
-                        "#2196F3" ->
-                                if (isSelected) R.drawable.color_circle_blue_selected
-                                else R.drawable.color_circle_blue
-                        "#FF9800" ->
-                                if (isSelected) R.drawable.color_circle_orange_selected
-                                else R.drawable.color_circle_orange
-                        "#E91E63" ->
-                                if (isSelected) R.drawable.color_circle_pink_selected
-                                else R.drawable.color_circle_pink
-                        "#9C27B0" ->
-                                if (isSelected) R.drawable.color_circle_purple_selected
-                                else R.drawable.color_circle_purple
-                        "#FF5722" ->
-                                if (isSelected) R.drawable.color_circle_red_selected
-                                else R.drawable.color_circle_red
-                        "#00BCD4" ->
-                                if (isSelected) R.drawable.color_circle_teal_selected
-                                else R.drawable.color_circle_teal
-                        "#3F51B5" ->
-                                if (isSelected) R.drawable.color_circle_indigo_selected
-                                else R.drawable.color_circle_indigo
-                        "#FFC107" ->
-                                if (isSelected) R.drawable.color_circle_amber_selected
-                                else R.drawable.color_circle_amber
-                        "#795548" ->
-                                if (isSelected) R.drawable.color_circle_brown_selected
-                                else R.drawable.color_circle_brown
-                        else -> R.drawable.color_circle_green
-                    }
-            colorView.setBackgroundResource(drawableRes)
-        }
-    }
-
-    private fun showDeleteCategoryDialog(category: BudgetCategory) {
-        AlertDialog.Builder(requireContext())
-                .setTitle("Delete Category")
-                .setMessage(
-                        "Are you sure you want to delete '${category.name}'? This will also delete all associated expenses."
-                )
-                .setPositiveButton("Delete") { _, _ ->
-                    categoriesViewModel.deleteCategory(category)
+                binding.recyclerViewCategories.apply {
+                        adapter = categoryAdapter
+                        layoutManager = LinearLayoutManager(requireContext())
                 }
-                .setNegativeButton("Cancel", null)
-                .show()
-    }
+        }
+
+        private fun setupObservers() {
+                categoriesViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
+                        categoryAdapter.submitList(categories)
+                }
+
+                // Fix any existing categories with missing colors
+                categoriesViewModel.fixMissingColors()
+        }
+
+        private fun setupClickListeners() {
+                binding.fabAddCategory.setOnClickListener { showAddCategoryDialog() }
+        }
+
+        private fun showAddCategoryDialog(categoryToEdit: BudgetCategory? = null) {
+                val dialogBinding =
+                        DialogAddCategoryBinding.inflate(LayoutInflater.from(requireContext()))
+
+                // Available color options
+                val colorOptions =
+                        arrayOf(
+                                "#4CAF50",
+                                "#2196F3",
+                                "#FF9800",
+                                "#E91E63",
+                                "#9C27B0",
+                                "#FF5722",
+                                "#00BCD4",
+                                "#3F51B5",
+                                "#FFC107",
+                                "#795548"
+                        )
+                var selectedColor = categoryToEdit?.color?.takeIf { it.isNotEmpty() } ?: "#4CAF50"
+
+                // Pre-fill if editing
+                categoryToEdit?.let { category ->
+                        dialogBinding.etCategoryName.setText(category.name)
+                        dialogBinding.etBudgetLimit.setText(category.budgetLimit.toString())
+                        selectedColor = category.color
+                }
+
+                // Setup color picker click listeners
+                val colorViews =
+                        arrayOf(
+                                dialogBinding.colorOption1,
+                                dialogBinding.colorOption2,
+                                dialogBinding.colorOption3,
+                                dialogBinding.colorOption4,
+                                dialogBinding.colorOption5,
+                                dialogBinding.colorOption6,
+                                dialogBinding.colorOption7,
+                                dialogBinding.colorOption8,
+                                dialogBinding.colorOption9,
+                                dialogBinding.colorOption10
+                        )
+
+                // Initialize color selection highlighting
+                updateColorSelection(colorViews, colorOptions, selectedColor)
+
+                colorViews.forEachIndexed { index, colorView ->
+                        colorView.setOnClickListener {
+                                selectedColor = colorOptions[index]
+                                updateColorSelection(colorViews, colorOptions, selectedColor)
+                        }
+                }
+
+                val dialog =
+                        AlertDialog.Builder(requireContext()).setView(dialogBinding.root).create()
+
+                dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
+
+                dialogBinding.btnSave.setOnClickListener {
+                        val name = dialogBinding.etCategoryName.text.toString().trim()
+                        val budgetLimitText = dialogBinding.etBudgetLimit.text.toString().trim()
+
+                        if (name.isEmpty() || budgetLimitText.isEmpty()) {
+                                Toast.makeText(
+                                                requireContext(),
+                                                "Please fill all fields",
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                return@setOnClickListener
+                        }
+
+                        val budgetLimit = budgetLimitText.toDoubleOrNull()
+                        if (budgetLimit == null || budgetLimit <= 0) {
+                                Toast.makeText(
+                                                requireContext(),
+                                                "Please enter a valid budget amount",
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                return@setOnClickListener
+                        }
+
+                        if (categoryToEdit == null) {
+                                // Adding new category
+                                val newCategory =
+                                        BudgetCategory(
+                                                name = name,
+                                                budgetLimit = budgetLimit,
+                                                color = selectedColor
+                                        )
+                                categoriesViewModel.insertCategory(newCategory)
+                        } else {
+                                // Editing existing category
+                                val updatedCategory =
+                                        categoryToEdit.copy(
+                                                name = name,
+                                                budgetLimit = budgetLimit,
+                                                color = selectedColor
+                                        )
+                                categoriesViewModel.updateCategory(updatedCategory)
+                        }
+
+                        dialog.dismiss()
+                }
+
+                dialog.show()
+        }
+
+        private fun updateColorSelection(
+                colorViews: Array<View>,
+                colorOptions: Array<String>,
+                selectedColor: String
+        ) {
+                colorViews.forEachIndexed { index, colorView ->
+                        val isSelected = colorOptions[index] == selectedColor
+                        val drawableRes =
+                                when (colorOptions[index]) {
+                                        "#4CAF50" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_green_selected
+                                                else R.drawable.color_circle_green
+                                        "#2196F3" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_blue_selected
+                                                else R.drawable.color_circle_blue
+                                        "#FF9800" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_orange_selected
+                                                else R.drawable.color_circle_orange
+                                        "#E91E63" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_pink_selected
+                                                else R.drawable.color_circle_pink
+                                        "#9C27B0" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_purple_selected
+                                                else R.drawable.color_circle_purple
+                                        "#FF5722" ->
+                                                if (isSelected) R.drawable.color_circle_red_selected
+                                                else R.drawable.color_circle_red
+                                        "#00BCD4" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_teal_selected
+                                                else R.drawable.color_circle_teal
+                                        "#3F51B5" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_indigo_selected
+                                                else R.drawable.color_circle_indigo
+                                        "#FFC107" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_amber_selected
+                                                else R.drawable.color_circle_amber
+                                        "#795548" ->
+                                                if (isSelected)
+                                                        R.drawable.color_circle_brown_selected
+                                                else R.drawable.color_circle_brown
+                                        else -> R.drawable.color_circle_green
+                                }
+                        colorView.setBackgroundResource(drawableRes)
+                }
+        }
+
+        private fun showDeleteCategoryDialog(category: BudgetCategory) {
+                AlertDialog.Builder(requireContext())
+                        .setTitle("Delete Category")
+                        .setMessage(
+                                "Are you sure you want to delete '${category.name}'? This will also delete all associated expenses."
+                        )
+                        .setPositiveButton("Delete") { _, _ ->
+                                categoriesViewModel.deleteCategory(category)
+                        }
+                        .setNegativeButton("Cancel", null)
+                        .show()
+        }
 }

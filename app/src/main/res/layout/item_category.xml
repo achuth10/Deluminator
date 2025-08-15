@@ -4,8 +4,10 @@
     style="@style/NeumorphicCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="16dp"
-    android:layout_marginTop="0dp">
+    android:layout_marginBottom="12dp"
+    android:layout_marginTop="0dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,77 +15,77 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Category Header -->
+        <!-- Category Name -->
+        <TextView
+            android:id="@+id/tvCategoryName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Food &amp; Dining"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="?attr/primaryTextColor"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Spent vs Remaining -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="8dp">
 
-            <TextView
-                android:id="@+id/tvCategoryName"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Food &amp; Dining"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="?attr/primaryTextColor" />
+                android:orientation="vertical">
 
-            <!-- Warning Indicator -->
-            <View
-                android:id="@+id/viewWarningIndicator"
-                android:layout_width="8dp"
-                android:layout_height="8dp"
-                android:background="@drawable/circle_background"
-                android:backgroundTint="@color/error_color"
-                android:layout_marginEnd="8dp"
-                android:layout_gravity="center_vertical"
-                android:visibility="gone" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Spent"
+                    android:textSize="11sp"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:layout_marginBottom="2dp" />
 
-            <TextView
-                android:id="@+id/tvRemainingAmount"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/tvSpentAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹320"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/primaryTextColor" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="$180 left"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/success_color"
-                android:maxLines="1" />
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="end">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Left"
+                    android:textSize="11sp"
+                    android:textColor="?attr/secondaryTextColor"
+                    android:layout_marginBottom="2dp" />
 
-        <!-- Budget Info -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="12dp">
+                <TextView
+                    android:id="@+id/tvRemainingAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="₹180"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="?attr/primaryTextColor" />
 
-            <TextView
-                android:id="@+id/tvSpentAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="$320"
-                android:textSize="14sp"
-                android:textColor="?attr/primaryTextColor"
-                android:maxLines="1" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" / "
-                android:textSize="14sp"
-                android:textColor="?attr/secondaryTextColor" />
-
-            <TextView
-                android:id="@+id/tvBudgetLimit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="$500"
-                android:textSize="14sp"
-                android:textColor="?attr/secondaryTextColor"
-                android:maxLines="1" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -92,22 +94,10 @@
             android:id="@+id/progressBarCategory"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="6dp"
+            android:layout_height="8dp"
             android:progress="64"
             android:progressTint="@color/success_color"
             android:progressBackgroundTint="?attr/progressBackgroundColor" />
-
-        <!-- Warning Text -->
-        <TextView
-            android:id="@+id/tvWarningText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Approaching budget limit"
-            android:textSize="12sp"
-            android:textColor="@color/error_color"
-            android:textStyle="italic"
-            android:layout_marginTop="6dp"
-            android:visibility="gone" />
 
     </LinearLayout>
 

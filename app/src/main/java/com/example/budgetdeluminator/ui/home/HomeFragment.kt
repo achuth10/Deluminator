@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.budgetdeluminator.databinding.FragmentHomeBinding
 import com.example.budgetdeluminator.ui.adapter.CategoryAdapter
 import com.example.budgetdeluminator.utils.CurrencyPreferences
@@ -60,7 +60,9 @@ class HomeFragment : Fragment() {
 
         binding.recyclerViewCategories.apply {
             adapter = categoryAdapter
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = GridLayoutManager(requireContext(), 2) // 2 columns
+            // Add some padding for better spacing
+            setPadding(4, 0, 4, 0)
         }
     }
 
@@ -81,12 +83,42 @@ class HomeFragment : Fragment() {
             tvTotalSpent.text = currencyPreferences.formatAmount(totalSpent)
             tvRemaining.text = currencyPreferences.formatAmount(remaining)
 
-            // Update progress bar
+            // Update progress bar with three-color system
             val percentage =
                     if (totalBudget > 0) {
                         ((totalSpent / totalBudget) * 100).toInt()
                     } else 0
             progressBarOverall.progress = percentage.coerceAtMost(100)
+
+            // Apply color to progress bar only
+            val progressColor =
+                    when {
+                        percentage > 100 ->
+                                android.graphics.Color.parseColor("#F44336") // Red for over budget
+                        percentage >= 80 ->
+                                android.graphics.Color.parseColor(
+                                        "#FF9800"
+                                ) // Orange/Yellow for warning
+                        else -> android.graphics.Color.parseColor("#4CAF50") // Green for normal
+                    }
+
+            progressBarOverall.progressTintList =
+                    android.content.res.ColorStateList.valueOf(progressColor)
+
+            // Color left amount based on remaining budget percentage
+            val leftColor =
+                    when {
+                        remaining < 0 ->
+                                android.graphics.Color.parseColor(
+                                        "#F44336"
+                                ) // Red if exceeded budget
+                        percentage >= 80 ->
+                                android.graphics.Color.parseColor(
+                                        "#FF9800"
+                                ) // Yellow if less than 20% left
+                        else -> android.graphics.Color.parseColor("#4CAF50") // Green otherwise
+                    }
+            tvRemaining.setTextColor(leftColor)
         }
     }
 

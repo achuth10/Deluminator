@@ -60,8 +60,8 @@ class MainActivity :
         setupBottomNavigation()
         setupClickListeners()
 
-        // Add some sample data if database is empty
-        addSampleDataIfNeeded()
+        // Add default categories if database is empty
+        addDefaultCategoriesIfNeeded()
     }
 
     private fun setupToolbar() {
@@ -85,19 +85,19 @@ class MainActivity :
             when (item.itemId) {
                 R.id.nav_home -> {
                     replaceFragment(homeFragment)
-                    supportActionBar?.title = "Deluminator"
+                    supportActionBar?.title = "Budget Overview"
                     binding.fabAddExpense.show()
                     true
                 }
                 R.id.nav_all_expenses -> {
                     replaceFragment(allExpensesFragment)
-                    supportActionBar?.title = "Expenses"
+                    supportActionBar?.title = "All Expenses"
                     binding.fabAddExpense.show()
                     true
                 }
                 R.id.nav_categories -> {
                     replaceFragment(categoriesFragment)
-                    supportActionBar?.title = "Categories"
+                    supportActionBar?.title = "Manage Categories"
                     binding.fabAddExpense.hide()
                     true
                 }
@@ -652,7 +652,7 @@ class MainActivity :
             dialog.dismiss()
             // Navigate to categories fragment
             replaceFragment(categoriesFragment)
-            supportActionBar?.title = "Categories"
+            supportActionBar?.title = "Manage Categories"
             binding.bottomNavigation.selectedItemId = R.id.nav_categories
             binding.fabAddExpense.hide()
         }
@@ -793,111 +793,67 @@ class MainActivity :
                 .show()
     }
 
-    private fun addSampleDataIfNeeded() {
+    private fun addDefaultCategoriesIfNeeded() {
         // Add sample categories if none exist
         homeViewModel.categoriesWithExpenses.observe(
                 this,
                 object : Observer<List<CategoryWithExpenses>> {
                     override fun onChanged(value: List<CategoryWithExpenses>) {
                         if (value.isEmpty()) {
-                            // Add sample categories
-                            val sampleCategories =
+                            // Add comprehensive default categories with appropriate colors
+                            val defaultCategories =
                                     listOf(
                                             BudgetCategory(
                                                     name = "Food & Dining",
-                                                    budgetLimit = 500.0
+                                                    budgetLimit = 500.0,
+                                                    color = "#4CAF50" // Green
                                             ),
                                             BudgetCategory(
                                                     name = "Transportation",
-                                                    budgetLimit = 200.0
+                                                    budgetLimit = 300.0,
+                                                    color = "#2196F3" // Blue
+                                            ),
+                                            BudgetCategory(
+                                                    name = "Shopping",
+                                                    budgetLimit = 400.0,
+                                                    color = "#FF9800" // Orange
                                             ),
                                             BudgetCategory(
                                                     name = "Entertainment",
-                                                    budgetLimit = 150.0
+                                                    budgetLimit = 200.0,
+                                                    color = "#E91E63" // Pink
                                             ),
-                                            BudgetCategory(name = "Shopping", budgetLimit = 300.0),
                                             BudgetCategory(
                                                     name = "Bills & Utilities",
-                                                    budgetLimit = 800.0
+                                                    budgetLimit = 800.0,
+                                                    color = "#9C27B0" // Purple
+                                            ),
+                                            BudgetCategory(
+                                                    name = "Healthcare",
+                                                    budgetLimit = 300.0,
+                                                    color = "#FF5722" // Red
+                                            ),
+                                            BudgetCategory(
+                                                    name = "Personal Care",
+                                                    budgetLimit = 150.0,
+                                                    color = "#00BCD4" // Teal
+                                            ),
+                                            BudgetCategory(
+                                                    name = "Education",
+                                                    budgetLimit = 250.0,
+                                                    color = "#3F51B5" // Indigo
                                             )
                                     )
 
-                            sampleCategories.forEach { category ->
+                            defaultCategories.forEach { category ->
                                 categoriesViewModel.insertCategory(category)
                             }
-
-                            // Add sample expenses after a short delay to ensure categories are
-                            // inserted
-                            binding.root.postDelayed({ addSampleExpenses() }, 500)
                         }
                         // Remove observer after first call
                         homeViewModel.categoriesWithExpenses.removeObserver(this)
                     }
                 }
         )
-    }
-
-    private fun addSampleExpenses() {
-        // Add some sample expenses to make the app more realistic
-        val sampleExpenses =
-                listOf(
-                        Expense(
-                                categoryId = 1,
-                                amount = 25.50,
-                                description = "Lunch at restaurant",
-                                createdAt = System.currentTimeMillis() - 2 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 1,
-                                amount = 45.20,
-                                description = "Grocery shopping",
-                                createdAt = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 1,
-                                amount = 12.75,
-                                description = "Coffee",
-                                createdAt = System.currentTimeMillis() - 3 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 2,
-                                amount = 15.00,
-                                description = "Bus fare",
-                                createdAt = System.currentTimeMillis() - 5 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 2,
-                                amount = 35.00,
-                                description = "Gas",
-                                createdAt = System.currentTimeMillis() - 2 * 24 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 3,
-                                amount = 18.99,
-                                description = "Movie ticket",
-                                createdAt = System.currentTimeMillis() - 3 * 24 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 3,
-                                amount = 9.99,
-                                description = "Streaming service",
-                                createdAt = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 4,
-                                amount = 89.99,
-                                description = "New shoes",
-                                createdAt = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000
-                        ),
-                        Expense(
-                                categoryId = 5,
-                                amount = 120.00,
-                                description = "Electricity bill",
-                                createdAt = System.currentTimeMillis() - 5 * 24 * 60 * 60 * 1000
-                        )
-                )
-
-        sampleExpenses.forEach { expense -> expensesViewModel.insertExpense(expense) }
     }
 
     // Fragment interface implementations

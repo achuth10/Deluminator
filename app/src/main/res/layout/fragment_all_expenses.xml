@@ -75,7 +75,7 @@
                     android:text="$0.00"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:textColor="@color/error_color" />
+                    android:textColor="?attr/primaryTextColor" />
 
                 </LinearLayout>
 
