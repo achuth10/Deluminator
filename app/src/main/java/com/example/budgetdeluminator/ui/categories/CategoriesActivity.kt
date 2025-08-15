@@ -35,6 +35,7 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setupRecyclerView()
         setupObservers()
         setupClickListeners()
+        setupBackPressedHandler()
     }
 
     private fun setupToolbar() {
@@ -161,12 +162,18 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         return true
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+    private fun setupBackPressedHandler() {
+        onBackPressedDispatcher.addCallback(
+                this,
+                object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                            binding.drawerLayout.closeDrawer(GravityCompat.START)
+                        } else {
+                            finish()
+                        }
+                    }
+                }
+        )
     }
 }

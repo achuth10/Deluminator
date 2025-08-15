@@ -63,6 +63,7 @@ class MainActivity :
         setupFragments()
         setupBottomNavigation()
         setupClickListeners()
+        setupBackPressedHandler()
 
         // Add some sample data if database is empty
         addSampleDataIfNeeded()
@@ -147,13 +148,19 @@ class MainActivity :
         return true
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+    private fun setupBackPressedHandler() {
+        onBackPressedDispatcher.addCallback(
+                this,
+                object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                            binding.drawerLayout.closeDrawer(GravityCompat.START)
+                        } else {
+                            finish()
+                        }
+                    }
+                }
+        )
     }
 
     private fun startExpenseEntryFlow() {
@@ -516,7 +523,7 @@ class MainActivity :
         var selectedCategory: BudgetCategory? = null
         var selectedDate = System.currentTimeMillis() // Default to current time
 
-        dialogBinding.tvExpenseAmount.text = currencyPreferences.formatAmount(amount)
+        dialogBinding.tvExpenseAmount.setText(currencyPreferences.formatAmount(amount))
         updateDateDisplay(dialogBinding, selectedDate)
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
@@ -524,7 +531,11 @@ class MainActivity :
         // Close button
         dialogBinding.btnCloseExpenseForm.setOnClickListener { dialog.dismiss() }
 
-        // Remove the edit amount button functionality since the plus button is removed
+        // Amount field - open calculator when clicked
+        dialogBinding.tvExpenseAmount.setOnClickListener {
+            dialog.dismiss()
+            showCalculatorDialog()
+        }
 
         // Date picker
         dialogBinding.tvExpenseDate.setOnClickListener {
@@ -535,21 +546,10 @@ class MainActivity :
         }
 
         // Category selector
-        dialogBinding.layoutCategorySelector.setOnClickListener {
+        dialogBinding.tvSelectedCategory.setOnClickListener {
             showCategorySelectionDialog { category ->
                 selectedCategory = category
-                dialogBinding.tvSelectedCategory.text = category.name
-                // Update category color if needed
-                try {
-                    val color = android.graphics.Color.parseColor(category.color)
-                    dialogBinding.viewCategoryColor.backgroundTintList =
-                            android.content.res.ColorStateList.valueOf(color)
-                } catch (e: IllegalArgumentException) {
-                    dialogBinding.viewCategoryColor.backgroundTintList =
-                            android.content.res.ColorStateList.valueOf(
-                                    android.graphics.Color.parseColor("#4CAF50")
-                            )
-                }
+                dialogBinding.tvSelectedCategory.setText(category.name)
             }
         }
 
@@ -578,7 +578,7 @@ class MainActivity :
         categoriesViewModel.allCategories.observe(this) { categories ->
             if (categories.isNotEmpty() && selectedCategory == null) {
                 selectedCategory = categories[0]
-                dialogBinding.tvSelectedCategory.text = categories[0].name
+                dialogBinding.tvSelectedCategory.setText(categories[0].name)
             }
         }
 
@@ -611,12 +611,13 @@ class MainActivity :
         val today = java.util.Date()
         val yesterday = java.util.Date(today.time - 24 * 60 * 60 * 1000)
 
-        dialogBinding.tvExpenseDate.text =
+        dialogBinding.tvExpenseDate.setText(
                 when {
                     isSameDay(date, today) -> "Today"
                     isSameDay(date, yesterday) -> "Yesterday"
                     else -> dateFormat.format(date)
                 }
+        )
     }
 
     private fun isSameDay(date1: java.util.Date, date2: java.util.Date): Boolean {
@@ -659,7 +660,7 @@ class MainActivity :
         var selectedDate = expense.createdAt
 
         // Set initial values
-        dialogBinding.tvExpenseAmount.text = currencyPreferences.formatAmount(expense.amount)
+        dialogBinding.tvExpenseAmount.setText(currencyPreferences.formatAmount(expense.amount))
         dialogBinding.etExpenseNote.setText(expense.description)
         updateDateDisplay(dialogBinding, selectedDate)
 
@@ -684,44 +685,22 @@ class MainActivity :
             val currentCategory = categories.find { it.id == expense.categoryId }
             currentCategory?.let { category ->
                 selectedCategory = category
-                dialogBinding.tvSelectedCategory.text = category.name
-                // Update category color
-                try {
-                    val color = android.graphics.Color.parseColor(category.color)
-                    dialogBinding.viewCategoryColor.backgroundTintList =
-                            android.content.res.ColorStateList.valueOf(color)
-                } catch (e: IllegalArgumentException) {
-                    dialogBinding.viewCategoryColor.backgroundTintList =
-                            android.content.res.ColorStateList.valueOf(
-                                    android.graphics.Color.parseColor("#4CAF50")
-                            )
-                }
+                dialogBinding.tvSelectedCategory.setText(category.name)
             }
         }
 
         // Category selector
-        dialogBinding.layoutCategorySelector.setOnClickListener {
+        dialogBinding.tvSelectedCategory.setOnClickListener {
             showCategorySelectionDialog { category ->
                 selectedCategory = category
-                dialogBinding.tvSelectedCategory.text = category.name
-                // Update category color
-                try {
-                    val color = android.graphics.Color.parseColor(category.color)
-                    dialogBinding.viewCategoryColor.backgroundTintList =
-                            android.content.res.ColorStateList.valueOf(color)
-                } catch (e: IllegalArgumentException) {
-                    dialogBinding.viewCategoryColor.backgroundTintList =
-                            android.content.res.ColorStateList.valueOf(
-                                    android.graphics.Color.parseColor("#4CAF50")
-                            )
-                }
+                dialogBinding.tvSelectedCategory.setText(category.name)
             }
         }
 
         // Amount editing - make it clickable to open calculator
         dialogBinding.tvExpenseAmount.setOnClickListener {
             showCalculatorDialogForEdit(expense.amount) { newAmount: Double ->
-                dialogBinding.tvExpenseAmount.text = currencyPreferences.formatAmount(newAmount)
+                dialogBinding.tvExpenseAmount.setText(currencyPreferences.formatAmount(newAmount))
             }
         }
 

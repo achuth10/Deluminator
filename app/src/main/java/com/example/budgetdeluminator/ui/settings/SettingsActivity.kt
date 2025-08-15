@@ -36,6 +36,7 @@ class SettingsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         setupToolbar()
         setupNavigationDrawer()
         setupCurrencySettings()
+        setupBackPressedHandler()
     }
 
     private fun setupToolbar() {
@@ -151,13 +152,19 @@ class SettingsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         return true
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            binding.drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
+    private fun setupBackPressedHandler() {
+        onBackPressedDispatcher.addCallback(
+                this,
+                object : androidx.activity.OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                            binding.drawerLayout.closeDrawer(GravityCompat.START)
+                        } else {
+                            finish()
+                        }
+                    }
+                }
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

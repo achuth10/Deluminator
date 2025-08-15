@@ -5,4 +5,7 @@
     <attr name="primaryTextColor" format="color" />
     <attr name="secondaryTextColor" format="color" />
     <attr name="progressBackgroundColor" format="color" />
+    <!-- Material 3 compatibility attributes -->
+    <attr name="colorSurfaceVariant" format="color" />
+    <attr name="colorOutline" format="color" />
 </resources>

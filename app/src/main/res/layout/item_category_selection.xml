@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:text="Food"
             android:textSize="16sp"
-            android:textColor="@android:color/white"
+            android:textColor="?attr/primaryTextColor"
             android:textStyle="bold" />
 
     </LinearLayout>
