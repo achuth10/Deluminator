@@ -116,6 +116,87 @@
 
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Theme Settings Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="?attr/cardBackgroundColor">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Theme Settings"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/primaryTextColor"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Current Theme Display -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="12dp"
+                        android:id="@+id/layoutThemeSelector">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_day"
+                            android:layout_marginEnd="16dp"
+                            android:tint="@color/design_default_color_primary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Selected Theme"
+                                android:textSize="14sp"
+                                android:textColor="?attr/secondaryTextColor" />
+
+                            <TextView
+                                android:id="@+id/tvSelectedTheme"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="System Default"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/primaryTextColor"
+                                android:maxLines="1"
+                                android:ellipsize="end" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/arrow_down_float"
+                            android:tint="?attr/secondaryTextColor" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
             <!-- About Currency Section -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/NeumorphicCardStyle"
@@ -132,7 +213,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="About Currency Settings"
+                        android:text="About Settings"
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:textColor="?attr/primaryTextColor"
@@ -141,7 +222,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="The selected currency will be used throughout the app for displaying amounts, budgets, and expenses. You can change this at any time."
+                        android:text="Customize your app experience with currency and theme preferences. The selected currency will be used throughout the app for displaying amounts, budgets, and expenses. Choose from Light, Dark, or System Default theme to match your preference."
                         android:textSize="14sp"
                         android:textColor="?attr/secondaryTextColor"
                         android:lineSpacingExtra="2dp" />

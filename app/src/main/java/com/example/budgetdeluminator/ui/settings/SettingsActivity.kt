@@ -11,13 +11,19 @@ import com.example.budgetdeluminator.databinding.ActivitySettingsBinding
 import com.example.budgetdeluminator.databinding.DialogCurrencySelectionBinding
 import com.example.budgetdeluminator.ui.adapter.CurrencyAdapter
 import com.example.budgetdeluminator.utils.CurrencyPreferences
+import com.example.budgetdeluminator.utils.ThemePreferences
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var currencyPreferences: CurrencyPreferences
+    private lateinit var themePreferences: ThemePreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply theme before calling super.onCreate()
+        themePreferences = ThemePreferences(this)
+        themePreferences.applyTheme()
+
         super.onCreate(savedInstanceState)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -26,6 +32,7 @@ class SettingsActivity : AppCompatActivity() {
 
         setupToolbar()
         setupCurrencySettings()
+        setupThemeSettings()
     }
 
     private fun setupToolbar() {
@@ -108,5 +115,37 @@ class SettingsActivity : AppCompatActivity() {
         )
 
         dialog.show()
+    }
+
+    private fun setupThemeSettings() {
+        updateThemeDisplay()
+        binding.layoutThemeSelector.setOnClickListener { showThemeSelectionDialog() }
+    }
+
+    private fun updateThemeDisplay() {
+        val selectedTheme = themePreferences.getThemeMode()
+        binding.tvSelectedTheme.text = themePreferences.getThemeDisplayName(selectedTheme)
+    }
+
+    private fun showThemeSelectionDialog() {
+        val themes = themePreferences.getAvailableThemes()
+        val themeNames = themes.map { themePreferences.getThemeDisplayName(it) }.toTypedArray()
+        val currentTheme = themePreferences.getThemeMode()
+        val selectedIndex = themes.indexOf(currentTheme)
+
+        AlertDialog.Builder(this)
+                .setTitle("Select Theme")
+                .setSingleChoiceItems(themeNames, selectedIndex) { dialog, which ->
+                    val selectedTheme = themes[which]
+                    themePreferences.setThemeMode(selectedTheme)
+                    themePreferences.applyTheme()
+                    updateThemeDisplay()
+                    dialog.dismiss()
+
+                    // Recreate activity to apply theme change
+                    recreate()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
     }
 }

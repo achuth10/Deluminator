@@ -14,6 +14,7 @@ material = "1.10.0"
 navigation = "2.7.6"
 room = "2.6.1"
 synth = "1.0.0"
+work = "2.9.0"
 
 [libraries]
 androidx-appcompat = {group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat"}
@@ -39,7 +40,11 @@ androidx-navigation-ui-ktx = {group = "androidx.navigation", name = "navigation-
 # Activity and Fragment
 androidx-activity-ktx = {group = "androidx.activity", name = "activity-ktx", version.ref = "activity"}
 androidx-fragment-ktx = {group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragment"}
-synth = { group = "club.cred.android", name = "synth", version.ref = "synth" }
+
+# WorkManager
+androidx-work-runtime-ktx = {group = "androidx.work", name = "work-runtime-ktx", version.ref = "work"}
+
+synth = {group = "club.cred.android", name = "synth", version.ref = "synth"}
 
 [plugins]
 android-application = {id = "com.android.application", version.ref = "agp"}

@@ -4,8 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.example.budgetdeluminator.data.dao.BudgetCategoryDao
 import com.example.budgetdeluminator.data.dao.ExpenseDao
+import com.example.budgetdeluminator.data.dao.RecurringExpenseDao
 import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.data.entity.Expense
+import com.example.budgetdeluminator.data.entity.RecurringExpense
 import com.example.budgetdeluminator.data.model.CategoryWithExpenses
 import com.example.budgetdeluminator.data.model.ExpenseWithCategory
 import java.util.*
@@ -14,7 +16,8 @@ import kotlinx.coroutines.withContext
 
 class BudgetRepository(
         private val budgetCategoryDao: BudgetCategoryDao,
-        private val expenseDao: ExpenseDao
+        private val expenseDao: ExpenseDao,
+        private val recurringExpenseDao: RecurringExpenseDao
 ) {
 
         // Category operations
@@ -166,5 +169,44 @@ class BudgetRepository(
                                         it.first
                                 }
                         )
+                }
+
+        // Recurring expense operations
+        fun getAllRecurringExpenses(): LiveData<List<RecurringExpense>> =
+                recurringExpenseDao.getAllRecurringExpenses()
+
+        fun getActiveRecurringExpenses(): LiveData<List<RecurringExpense>> =
+                recurringExpenseDao.getActiveRecurringExpenses()
+
+        fun getRecurringExpensesByCategory(categoryId: Long): LiveData<List<RecurringExpense>> =
+                recurringExpenseDao.getRecurringExpensesByCategory(categoryId)
+
+        suspend fun getRecurringExpenseById(id: Long): RecurringExpense? =
+                withContext(Dispatchers.IO) { recurringExpenseDao.getRecurringExpenseById(id) }
+
+        suspend fun getActiveRecurringExpensesSync(): List<RecurringExpense> =
+                withContext(Dispatchers.IO) { recurringExpenseDao.getActiveRecurringExpensesSync() }
+
+        suspend fun insertRecurringExpense(recurringExpense: RecurringExpense): Long =
+                withContext(Dispatchers.IO) {
+                        recurringExpenseDao.insertRecurringExpense(recurringExpense)
+                }
+
+        suspend fun updateRecurringExpense(recurringExpense: RecurringExpense) =
+                withContext(Dispatchers.IO) {
+                        recurringExpenseDao.updateRecurringExpense(recurringExpense)
+                }
+
+        suspend fun deleteRecurringExpense(recurringExpense: RecurringExpense) =
+                withContext(Dispatchers.IO) {
+                        recurringExpenseDao.deleteRecurringExpense(recurringExpense)
+                }
+
+        suspend fun updateRecurringExpenseActiveStatus(id: Long, isActive: Boolean) =
+                withContext(Dispatchers.IO) { recurringExpenseDao.updateActiveStatus(id, isActive) }
+
+        suspend fun updateRecurringExpenseLastGeneratedAt(id: Long, timestamp: Long) =
+                withContext(Dispatchers.IO) {
+                        recurringExpenseDao.updateLastGeneratedAt(id, timestamp)
                 }
 }

@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp"
+    app:cardCornerRadius="28dp"
+    app:cardElevation="6dp"
+    app:cardBackgroundColor="?attr/cardBackgroundColor">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Dialog Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="24dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/tvRecurringExpenseFormTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add Recurring Expense"
+            android:textSize="24sp"
+            android:textStyle="normal"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="?attr/primaryTextColor" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCloseRecurringExpenseForm"
+            style="@style/Widget.Material3.Button.IconButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            app:icon="@android:drawable/ic_menu_close_clear_cancel"
+            app:iconTint="?attr/primaryTextColor"
+            android:background="?android:attr/selectableItemBackgroundBorderless" />
+
+    </LinearLayout>
+
+    <!-- Content Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginBottom="24dp">
+
+        <!-- Recurrence Type Section -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="Recurrence"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:endIconMode="dropdown_menu">
+
+            <AutoCompleteTextView
+                android:id="@+id/tvRecurrenceType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Recurrence"
+                android:textColor="?attr/primaryTextColor"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Recurrence Value Section (Dynamic based on type) -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/layoutRecurrenceValue"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="Time"
+            android:visibility="gone"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp"
+            app:endIconMode="none">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tvRecurrenceValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Time"
+                android:textColor="?attr/primaryTextColor"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Amount Section -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/NeumorphicTextInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Amount"
+            app:endIconMode="none">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tvRecurringExpenseAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0.00"
+                android:textColor="?attr/primaryTextColor"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Category Section -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/NeumorphicTextInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Category"
+            app:endIconMode="dropdown_menu">
+
+            <AutoCompleteTextView
+                android:id="@+id/tvSelectedRecurringCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Category"
+                android:textColor="?attr/primaryTextColor"
+                android:clickable="true"
+                android:focusable="false"
+                android:inputType="none"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Note Section -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/NeumorphicTextInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Description"
+            android:layout_marginBottom="0dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRecurringExpenseNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapSentences"
+                android:maxLines="2"
+                android:textColor="?attr/primaryTextColor"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <!-- Action Button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSaveRecurringExpense"
+            style="@style/NeumorphicButtonPrimaryStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:minWidth="120dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

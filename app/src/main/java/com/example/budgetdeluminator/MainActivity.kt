@@ -4,17 +4,23 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.data.entity.Expense
+import com.example.budgetdeluminator.data.entity.ExpenseSource
+import com.example.budgetdeluminator.data.entity.RecurrenceType
+import com.example.budgetdeluminator.data.entity.RecurringExpense
 import com.example.budgetdeluminator.data.model.CategoryWithExpenses
 import com.example.budgetdeluminator.databinding.ActivityMainBinding
 import com.example.budgetdeluminator.databinding.DialogAddExpenseBinding
+import com.example.budgetdeluminator.databinding.DialogAddRecurringExpenseBinding
 import com.example.budgetdeluminator.databinding.DialogCalculatorBinding
 import com.example.budgetdeluminator.databinding.DialogCategorySelectionBinding
 import com.example.budgetdeluminator.databinding.DialogExpensesListBinding
@@ -26,14 +32,19 @@ import com.example.budgetdeluminator.ui.expenses.AllExpensesFragment
 import com.example.budgetdeluminator.ui.expenses.ExpensesViewModel
 import com.example.budgetdeluminator.ui.home.HomeFragment
 import com.example.budgetdeluminator.ui.home.HomeViewModel
+import com.example.budgetdeluminator.ui.recurring.RecurringExpensesFragment
+import com.example.budgetdeluminator.ui.recurring.RecurringExpensesViewModel
 import com.example.budgetdeluminator.utils.Calculator
 import com.example.budgetdeluminator.utils.Constants
 import com.example.budgetdeluminator.utils.CurrencyPreferences
 import com.example.budgetdeluminator.utils.ErrorHandler
+import com.example.budgetdeluminator.utils.RecurrenceScheduler
+import com.example.budgetdeluminator.utils.ThemePreferences
 import com.example.budgetdeluminator.utils.ValidationResult
 import com.example.budgetdeluminator.utils.ValidationUtils
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.launch
 
 /**
  * Main activity of the Budget Deluminator app.
@@ -63,14 +74,22 @@ class MainActivity :
     private val homeViewModel: HomeViewModel by viewModels()
     private val categoriesViewModel: CategoriesViewModel by viewModels()
     private val expensesViewModel: ExpensesViewModel by viewModels()
+    private val recurringExpensesViewModel: RecurringExpensesViewModel by viewModels()
     private lateinit var currencyPreferences: CurrencyPreferences
     private val dateFormat = SimpleDateFormat(Constants.DATE_FORMAT_DISPLAY, Locale.US)
 
     private lateinit var homeFragment: HomeFragment
     private lateinit var allExpensesFragment: AllExpensesFragment
     private lateinit var categoriesFragment: CategoriesFragment
+    private lateinit var recurringExpensesFragment: RecurringExpensesFragment
+
+    private var hasShownBackgroundPermissionDialog = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply theme before calling super.onCreate()
+        val themePreferences = ThemePreferences(this)
+        themePreferences.applyTheme()
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -83,12 +102,17 @@ class MainActivity :
 
         // Add default categories if database is empty
         addDefaultCategoriesIfNeeded()
+
+        // Initialize recurring expense scheduling
+        val recurrenceScheduler = RecurrenceScheduler(this)
+        recurrenceScheduler.scheduleRecurringExpenseWork()
     }
 
     private fun setupFragments() {
         homeFragment = HomeFragment()
         allExpensesFragment = AllExpensesFragment()
         categoriesFragment = CategoriesFragment()
+        recurringExpensesFragment = RecurringExpensesFragment()
 
         // Show home fragment by default
         supportFragmentManager
@@ -115,6 +139,12 @@ class MainActivity :
                 R.id.nav_categories -> {
                     replaceFragment(categoriesFragment)
                     supportActionBar?.title = "Categories"
+                    binding.fabAddExpense.hide()
+                    true
+                }
+                R.id.nav_recurring_expenses -> {
+                    replaceFragment(recurringExpensesFragment)
+                    supportActionBar?.title = "Recurring Expenses"
                     binding.fabAddExpense.hide()
                     true
                 }
@@ -910,5 +940,444 @@ class MainActivity :
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+    }
+
+    // Recurring Expense Dialog Methods
+    fun showAddRecurringExpenseDialog() {
+        showRecurringExpenseDialog(null)
+    }
+
+    fun showEditRecurringExpenseDialog(recurringExpense: RecurringExpense) {
+        showRecurringExpenseDialog(recurringExpense)
+    }
+
+    private fun showRecurringExpenseDialog(recurringExpense: RecurringExpense?) {
+        val dialogBinding = DialogAddRecurringExpenseBinding.inflate(LayoutInflater.from(this))
+        var selectedCategory: BudgetCategory? = null
+        var selectedRecurrenceType: RecurrenceType? = null
+        var selectedRecurrenceValue: Int = 0
+        var currentAmount: Double = 0.0
+
+        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+
+        // Set title based on edit/add mode
+        dialogBinding.tvRecurringExpenseFormTitle.text =
+                if (recurringExpense != null) "Edit Recurring Expense" else "Add Recurring Expense"
+
+        // Initialize with existing data if editing
+        recurringExpense?.let { expense ->
+            currentAmount = expense.amount
+            selectedRecurrenceType = expense.recurrenceType
+            selectedRecurrenceValue = expense.recurrenceValue
+
+            dialogBinding.tvRecurringExpenseAmount.setText(
+                    currencyPreferences.formatAmount(expense.amount)
+            )
+            dialogBinding.etRecurringExpenseNote.setText(expense.description)
+            dialogBinding.tvRecurrenceType.setText(
+                    getRecurrenceTypeDisplayName(expense.recurrenceType)
+            )
+            updateRecurrenceValueDisplay(
+                    dialogBinding,
+                    expense.recurrenceType,
+                    expense.recurrenceValue
+            )
+
+            // Find and set category
+            categoriesViewModel.allCategories.observe(this) { categories ->
+                selectedCategory = categories.find { it.id == expense.categoryId }
+                selectedCategory?.let { dialogBinding.tvSelectedRecurringCategory.setText(it.name) }
+            }
+        }
+
+        // Close button
+        dialogBinding.btnCloseRecurringExpenseForm.setOnClickListener { dialog.dismiss() }
+
+        // Amount field - open calculator
+        dialogBinding.tvRecurringExpenseAmount.setOnClickListener {
+            val currentAmountText = dialogBinding.tvRecurringExpenseAmount.text.toString()
+            val amount =
+                    try {
+                        currencyPreferences.parseAmount(currentAmountText)
+                    } catch (e: Exception) {
+                        0.0
+                    }
+
+            showCalculatorDialogForEdit(amount) { newAmount ->
+                currentAmount = newAmount
+                dialogBinding.tvRecurringExpenseAmount.setText(
+                        currencyPreferences.formatAmount(newAmount)
+                )
+            }
+        }
+
+        // Recurrence type selector
+        dialogBinding.tvRecurrenceType.setOnClickListener {
+            showRecurrenceTypeSelectionDialog { recurrenceType ->
+                selectedRecurrenceType = recurrenceType
+                dialogBinding.tvRecurrenceType.setText(getRecurrenceTypeDisplayName(recurrenceType))
+
+                // Show recurrence value picker
+                dialogBinding.layoutRecurrenceValue.visibility = View.VISIBLE
+                dialogBinding.tvRecurrenceValue.setText(
+                        "Select ${getRecurrenceValueLabel(recurrenceType)}"
+                )
+                selectedRecurrenceValue = 0 // Reset value when type changes
+            }
+        }
+
+        // Recurrence value selector
+        dialogBinding.tvRecurrenceValue.setOnClickListener {
+            selectedRecurrenceType?.let { type ->
+                showRecurrenceValueSelectionDialog(type) { value ->
+                    selectedRecurrenceValue = value
+                    updateRecurrenceValueDisplay(dialogBinding, type, value)
+                }
+            }
+        }
+
+        // Category selector
+        dialogBinding.tvSelectedRecurringCategory.setOnClickListener {
+            showCategorySelectionDialog { category ->
+                selectedCategory = category
+                dialogBinding.tvSelectedRecurringCategory.setText(category.name)
+            }
+        }
+
+        // Save button
+        dialogBinding.btnSaveRecurringExpense.setOnClickListener {
+            ErrorHandler.safeExecute(this, dialogBinding.root, "Failed to save recurring expense") {
+                selectedCategory?.let { category ->
+                    selectedRecurrenceType?.let { recurrenceType ->
+                        val description =
+                                ValidationUtils.sanitizeInput(
+                                        dialogBinding.etRecurringExpenseNote.text.toString()
+                                )
+
+                        // Validate inputs
+                        val amountValidation = ValidationUtils.validateExpenseAmount(currentAmount)
+                        val descriptionValidation =
+                                ValidationUtils.validateExpenseDescription(description)
+
+                        when {
+                            !amountValidation.isSuccess() -> {
+                                ErrorHandler.handleValidationError(
+                                        this,
+                                        amountValidation,
+                                        dialogBinding.root
+                                )
+                            }
+                            !descriptionValidation.isSuccess() -> {
+                                ErrorHandler.handleValidationError(
+                                        this,
+                                        descriptionValidation,
+                                        dialogBinding.root
+                                )
+                                dialogBinding.etRecurringExpenseNote.error =
+                                        descriptionValidation.getErrorMessage()
+                            }
+                            selectedRecurrenceValue == 0 -> {
+                                ErrorHandler.handleValidationError(
+                                        this,
+                                        ValidationResult.Error(
+                                                "Please select ${getRecurrenceValueLabel(recurrenceType)}"
+                                        ),
+                                        dialogBinding.root
+                                )
+                            }
+                            else -> {
+                                if (recurringExpense != null) {
+                                    // Update existing
+                                    val updatedExpense =
+                                            recurringExpense.copy(
+                                                    categoryId = category.id,
+                                                    amount = currentAmount,
+                                                    description = description,
+                                                    recurrenceType = recurrenceType,
+                                                    recurrenceValue = selectedRecurrenceValue
+                                            )
+                                    recurringExpensesViewModel.updateRecurringExpense(
+                                            updatedExpense
+                                    )
+                                    Toast.makeText(
+                                                    this,
+                                                    "Recurring expense updated",
+                                                    Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+                                } else {
+                                    // Create new
+                                    val newExpense =
+                                            RecurringExpense(
+                                                    categoryId = category.id,
+                                                    amount = currentAmount,
+                                                    description = description,
+                                                    recurrenceType = recurrenceType,
+                                                    recurrenceValue = selectedRecurrenceValue
+                                            )
+                                    recurringExpensesViewModel.insertRecurringExpense(newExpense)
+                                    Toast.makeText(
+                                                    this,
+                                                    "Recurring expense created",
+                                                    Toast.LENGTH_SHORT
+                                            )
+                                            .show()
+
+                                    // Check for background processing permissions after creating
+                                    // first recurring expense
+                                    checkBackgroundProcessingPermissionsAfterCreation()
+                                }
+                                dialog.dismiss()
+                            }
+                        }
+                    }
+                            ?: run {
+                                ErrorHandler.handleValidationError(
+                                        this,
+                                        ValidationResult.Error("Please select recurrence type"),
+                                        dialogBinding.root
+                                )
+                            }
+                }
+                        ?: run {
+                            ErrorHandler.handleValidationError(
+                                    this,
+                                    ValidationResult.Error("Please select a category"),
+                                    dialogBinding.root
+                            )
+                        }
+            }
+        }
+
+        // Auto-select first category if adding new
+        if (recurringExpense == null) {
+            categoriesViewModel.allCategories.observe(this) { categories ->
+                if (categories.isNotEmpty() && selectedCategory == null) {
+                    selectedCategory = categories[0]
+                    dialogBinding.tvSelectedRecurringCategory.setText(categories[0].name)
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
+    private fun showRecurrenceTypeSelectionDialog(onTypeSelected: (RecurrenceType) -> Unit) {
+        val types = arrayOf("Daily", "Weekly", "Monthly")
+        AlertDialog.Builder(this)
+                .setTitle("Select Recurrence Type")
+                .setItems(types) { _, which ->
+                    val recurrenceType =
+                            when (which) {
+                                0 -> RecurrenceType.DAILY
+                                1 -> RecurrenceType.WEEKLY
+                                2 -> RecurrenceType.MONTHLY
+                                else -> RecurrenceType.DAILY
+                            }
+                    onTypeSelected(recurrenceType)
+                }
+                .show()
+    }
+
+    private fun showRecurrenceValueSelectionDialog(
+            type: RecurrenceType,
+            onValueSelected: (Int) -> Unit
+    ) {
+        when (type) {
+            RecurrenceType.DAILY -> showTimePickerDialog(onValueSelected)
+            RecurrenceType.WEEKLY -> showDayOfWeekPickerDialog(onValueSelected)
+            RecurrenceType.MONTHLY -> showDayOfMonthPickerDialog(onValueSelected)
+        }
+    }
+
+    private fun showTimePickerDialog(onTimeSelected: (Int) -> Unit) {
+        val timePickerDialog =
+                android.app.TimePickerDialog(
+                        this,
+                        { _, hourOfDay, _ -> onTimeSelected(hourOfDay) },
+                        9, // Default to 9 AM
+                        0,
+                        false // 12-hour format
+                )
+        timePickerDialog.show()
+    }
+
+    private fun showDayOfWeekPickerDialog(onDaySelected: (Int) -> Unit) {
+        val days =
+                arrayOf(
+                        "Sunday",
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday"
+                )
+        AlertDialog.Builder(this)
+                .setTitle("Select Day of Week")
+                .setItems(days) { _, which ->
+                    onDaySelected(which + 1) // Calendar.SUNDAY = 1
+                }
+                .show()
+    }
+
+    private fun showDayOfMonthPickerDialog(onDaySelected: (Int) -> Unit) {
+        val days = (1..31).map { "${it}${getDayOrdinalSuffix(it)}" }.toTypedArray()
+        AlertDialog.Builder(this)
+                .setTitle("Select Day of Month")
+                .setItems(days) { _, which -> onDaySelected(which + 1) }
+                .show()
+    }
+
+    private fun getRecurrenceTypeDisplayName(type: RecurrenceType): String {
+        return when (type) {
+            RecurrenceType.DAILY -> "Daily"
+            RecurrenceType.WEEKLY -> "Weekly"
+            RecurrenceType.MONTHLY -> "Monthly"
+        }
+    }
+
+    private fun getRecurrenceValueLabel(type: RecurrenceType): String {
+        return when (type) {
+            RecurrenceType.DAILY -> "time"
+            RecurrenceType.WEEKLY -> "day of week"
+            RecurrenceType.MONTHLY -> "day of month"
+        }
+    }
+
+    private fun updateRecurrenceValueDisplay(
+            dialogBinding: DialogAddRecurringExpenseBinding,
+            type: RecurrenceType,
+            value: Int
+    ) {
+        val displayText =
+                when (type) {
+                    RecurrenceType.DAILY -> {
+                        val calendar =
+                                Calendar.getInstance().apply {
+                                    set(Calendar.HOUR_OF_DAY, value)
+                                    set(Calendar.MINUTE, 0)
+                                }
+                        val timeFormat = SimpleDateFormat("h:mm a", Locale.US)
+                        timeFormat.format(calendar.time)
+                    }
+                    RecurrenceType.WEEKLY -> {
+                        when (value) {
+                            1 -> "Sunday"
+                            2 -> "Monday"
+                            3 -> "Tuesday"
+                            4 -> "Wednesday"
+                            5 -> "Thursday"
+                            6 -> "Friday"
+                            7 -> "Saturday"
+                            else -> "Invalid day"
+                        }
+                    }
+                    RecurrenceType.MONTHLY -> {
+                        "$value${getDayOrdinalSuffix(value)}"
+                    }
+                }
+        dialogBinding.tvRecurrenceValue.setText(displayText)
+        dialogBinding.layoutRecurrenceValue.visibility = View.VISIBLE
+    }
+
+    private fun getDayOrdinalSuffix(day: Int): String {
+        return when {
+            day in 11..13 -> "th"
+            day % 10 == 1 -> "st"
+            day % 10 == 2 -> "nd"
+            day % 10 == 3 -> "rd"
+            else -> "th"
+        }
+    }
+
+    // Background Processing & Fallback Methods
+    private fun checkBackgroundProcessingPermissionsAfterCreation() {
+        val recurrenceScheduler = RecurrenceScheduler(this)
+        val prefs = getSharedPreferences("background_permissions", MODE_PRIVATE)
+        val hasAskedBefore = prefs.getBoolean("has_asked_background_permission", false)
+
+        // Only show dialog if we haven't asked before and background processing is not allowed
+        if (!hasShownBackgroundPermissionDialog &&
+                        !hasAskedBefore &&
+                        !recurrenceScheduler.isBackgroundProcessingAllowed()
+        ) {
+            hasShownBackgroundPermissionDialog = true
+            showBackgroundPermissionDialog()
+        }
+    }
+
+    private fun showBackgroundPermissionDialog() {
+        val prefs = getSharedPreferences("background_permissions", MODE_PRIVATE)
+
+        AlertDialog.Builder(this)
+                .setTitle("Background Processing")
+                .setMessage(
+                        "You've created a recurring expense! To automatically add future recurring expenses, this app needs permission to run in the background. Would you like to enable this?"
+                )
+                .setPositiveButton("Enable") { _, _ ->
+                    // Mark as asked so we don't show again
+                    prefs.edit().putBoolean("has_asked_background_permission", true).apply()
+
+                    val recurrenceScheduler = RecurrenceScheduler(this)
+                    recurrenceScheduler.getBatteryOptimizationIntent()?.let { intent ->
+                        try {
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            Toast.makeText(
+                                            this,
+                                            "Unable to open battery settings",
+                                            Toast.LENGTH_SHORT
+                                    )
+                                    .show()
+                        }
+                    }
+                }
+                .setNegativeButton("Manual Mode") { _, _ ->
+                    // Mark as asked so we don't show again
+                    prefs.edit().putBoolean("has_asked_background_permission", true).apply()
+
+                    Toast.makeText(
+                                    this,
+                                    "You can manually sync recurring expenses from the Recurring tab",
+                                    Toast.LENGTH_LONG
+                            )
+                            .show()
+                }
+                .setNeutralButton("Later") { _, _ ->
+                    // Don't mark as asked for "Later" - user might want to see it again next time
+                }
+                .show()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        // Manual fallback: Process recurring expenses when app is opened
+        // This ensures expenses are generated even if background processing is restricted
+        processRecurringExpensesOnResume()
+    }
+
+    private fun processRecurringExpensesOnResume() {
+        val recurrenceScheduler = RecurrenceScheduler(this)
+
+        // Only process if background processing is restricted or hasn't run recently
+        if (!recurrenceScheduler.isBackgroundProcessingAllowed()) {
+            lifecycleScope.launch {
+                try {
+                    val generatedCount = recurrenceScheduler.processRecurringExpensesManually()
+                    if (generatedCount > 0) {
+                        Toast.makeText(
+                                        this@MainActivity,
+                                        "Generated $generatedCount recurring expense${if (generatedCount == 1) "" else "s"}",
+                                        Toast.LENGTH_SHORT
+                                )
+                                .show()
+                    }
+                } catch (e: Exception) {
+                    // Silently handle errors - don't bother user with technical issues
+                }
+            }
+        }
     }
 }
