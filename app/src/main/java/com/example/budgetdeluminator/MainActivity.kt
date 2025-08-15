@@ -4,12 +4,11 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,26 +22,23 @@ import com.example.budgetdeluminator.databinding.DialogCategorySelectionBinding
 import com.example.budgetdeluminator.databinding.DialogExpensesListBinding
 import com.example.budgetdeluminator.ui.adapter.CategorySelectionAdapter
 import com.example.budgetdeluminator.ui.adapter.ExpenseAdapter
-import com.example.budgetdeluminator.ui.categories.CategoriesActivity
+import com.example.budgetdeluminator.ui.categories.CategoriesFragment
 import com.example.budgetdeluminator.ui.categories.CategoriesViewModel
 import com.example.budgetdeluminator.ui.expenses.AllExpensesFragment
 import com.example.budgetdeluminator.ui.expenses.ExpensesViewModel
 import com.example.budgetdeluminator.ui.home.HomeFragment
 import com.example.budgetdeluminator.ui.home.HomeViewModel
 import com.example.budgetdeluminator.utils.CurrencyPreferences
-import com.google.android.material.navigation.NavigationView
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity :
         AppCompatActivity(),
-        NavigationView.OnNavigationItemSelectedListener,
         HomeFragment.OnCategoryClickListener,
         AllExpensesFragment.OnExpenseClickListener,
         AllExpensesFragment.OnExpenseDeleteListener {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var drawerToggle: ActionBarDrawerToggle
     private val homeViewModel: HomeViewModel by viewModels()
     private val categoriesViewModel: CategoriesViewModel by viewModels()
     private val expensesViewModel: ExpensesViewModel by viewModels()
@@ -51,6 +47,7 @@ class MainActivity :
 
     private lateinit var homeFragment: HomeFragment
     private lateinit var allExpensesFragment: AllExpensesFragment
+    private lateinit var categoriesFragment: CategoriesFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,11 +56,9 @@ class MainActivity :
 
         currencyPreferences = CurrencyPreferences(this)
         setupToolbar()
-        setupNavigationDrawer()
         setupFragments()
         setupBottomNavigation()
         setupClickListeners()
-        setupBackPressedHandler()
 
         // Add some sample data if database is empty
         addSampleDataIfNeeded()
@@ -71,23 +66,12 @@ class MainActivity :
 
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun setupNavigationDrawer() {
-        drawerToggle = ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, 0, 0)
-        binding.drawerLayout.addDrawerListener(drawerToggle)
-        drawerToggle.syncState()
-
-        binding.navigationView.setNavigationItemSelectedListener(this)
-
-        // Set the home menu item as selected
-        binding.navigationView.setCheckedItem(R.id.nav_home)
     }
 
     private fun setupFragments() {
         homeFragment = HomeFragment()
         allExpensesFragment = AllExpensesFragment()
+        categoriesFragment = CategoriesFragment()
 
         // Show home fragment by default
         supportFragmentManager
@@ -101,10 +85,20 @@ class MainActivity :
             when (item.itemId) {
                 R.id.nav_home -> {
                     replaceFragment(homeFragment)
+                    supportActionBar?.title = "Deluminator"
+                    binding.fabAddExpense.show()
                     true
                 }
                 R.id.nav_all_expenses -> {
                     replaceFragment(allExpensesFragment)
+                    supportActionBar?.title = "Expenses"
+                    binding.fabAddExpense.show()
+                    true
+                }
+                R.id.nav_categories -> {
+                    replaceFragment(categoriesFragment)
+                    supportActionBar?.title = "Categories"
+                    binding.fabAddExpense.hide()
                     true
                 }
                 else -> false
@@ -126,15 +120,14 @@ class MainActivity :
         binding.fabAddExpense.setOnClickListener { startExpenseEntryFlow() }
     }
 
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_home -> {
-                // Already on home screen - just close drawer
-            }
-            R.id.nav_categories -> {
-                startActivity(Intent(this, CategoriesActivity::class.java))
-            }
-            R.id.nav_settings -> {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.toolbar_menu, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
                 startActivity(
                         Intent(
                                 this,
@@ -142,25 +135,10 @@ class MainActivity :
                                         .java
                         )
                 )
+                true
             }
+            else -> super.onOptionsItemSelected(item)
         }
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    private fun setupBackPressedHandler() {
-        onBackPressedDispatcher.addCallback(
-                this,
-                object : androidx.activity.OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                            binding.drawerLayout.closeDrawer(GravityCompat.START)
-                        } else {
-                            finish()
-                        }
-                    }
-                }
-        )
     }
 
     private fun startExpenseEntryFlow() {
@@ -672,7 +650,11 @@ class MainActivity :
 
         dialogBinding.btnAddCategoryFromSelection.setOnClickListener {
             dialog.dismiss()
-            startActivity(Intent(this, CategoriesActivity::class.java))
+            // Navigate to categories fragment
+            replaceFragment(categoriesFragment)
+            supportActionBar?.title = "Categories"
+            binding.bottomNavigation.selectedItemId = R.id.nav_categories
+            binding.fabAddExpense.hide()
         }
 
         dialog.show()

@@ -1,58 +1,49 @@
 package com.example.budgetdeluminator.ui.categories
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.budgetdeluminator.R
 import com.example.budgetdeluminator.data.entity.BudgetCategory
-import com.example.budgetdeluminator.databinding.ActivityCategoriesBinding
 import com.example.budgetdeluminator.databinding.DialogAddCategoryBinding
+import com.example.budgetdeluminator.databinding.FragmentCategoriesBinding
 import com.example.budgetdeluminator.ui.adapter.CategoryManagementAdapter
-import com.google.android.material.navigation.NavigationView
 
-class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class CategoriesFragment : Fragment() {
 
-    private lateinit var binding: ActivityCategoriesBinding
+    private var _binding: FragmentCategoriesBinding? = null
+    private val binding
+        get() = _binding!!
+
     private lateinit var categoryAdapter: CategoryManagementAdapter
-    private lateinit var drawerToggle: ActionBarDrawerToggle
     private val categoriesViewModel: CategoriesViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityCategoriesBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentCategoriesBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        setupToolbar()
-        setupNavigationDrawer()
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         setupRecyclerView()
         setupObservers()
         setupClickListeners()
-        setupBackPressedHandler()
     }
 
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-    }
-
-    private fun setupNavigationDrawer() {
-        drawerToggle = ActionBarDrawerToggle(this, binding.drawerLayout, binding.toolbar, 0, 0)
-        binding.drawerLayout.addDrawerListener(drawerToggle)
-        drawerToggle.syncState()
-
-        binding.navigationView.setNavigationItemSelectedListener(this)
-
-        // Set the current menu item as selected
-        binding.navigationView.setCheckedItem(R.id.nav_categories)
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun setupRecyclerView() {
@@ -64,12 +55,12 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         binding.recyclerViewCategories.apply {
             adapter = categoryAdapter
-            layoutManager = LinearLayoutManager(this@CategoriesActivity)
+            layoutManager = LinearLayoutManager(requireContext())
         }
     }
 
     private fun setupObservers() {
-        categoriesViewModel.allCategories.observe(this) { categories ->
+        categoriesViewModel.allCategories.observe(viewLifecycleOwner) { categories ->
             categoryAdapter.submitList(categories)
         }
 
@@ -82,7 +73,7 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
     private fun showAddCategoryDialog(categoryToEdit: BudgetCategory? = null) {
-        val dialogBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(this))
+        val dialogBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(requireContext()))
 
         // Available color options
         val colorOptions =
@@ -132,7 +123,7 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
         }
 
-        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        val dialog = AlertDialog.Builder(requireContext()).setView(dialogBinding.root).create()
 
         dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
 
@@ -141,13 +132,18 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             val budgetLimitText = dialogBinding.etBudgetLimit.text.toString().trim()
 
             if (name.isEmpty() || budgetLimitText.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT)
+                        .show()
                 return@setOnClickListener
             }
 
             val budgetLimit = budgetLimitText.toDoubleOrNull()
             if (budgetLimit == null || budgetLimit <= 0) {
-                Toast.makeText(this, "Please enter a valid budget amount", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                                requireContext(),
+                                "Please enter a valid budget amount",
+                                Toast.LENGTH_SHORT
+                        )
                         .show()
                 return@setOnClickListener
             }
@@ -224,7 +220,7 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
     private fun showDeleteCategoryDialog(category: BudgetCategory) {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(requireContext())
                 .setTitle("Delete Category")
                 .setMessage(
                         "Are you sure you want to delete '${category.name}'? This will also delete all associated expenses."
@@ -234,44 +230,5 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_home -> {
-                startActivity(Intent(this, com.example.budgetdeluminator.MainActivity::class.java))
-                finish()
-            }
-            R.id.nav_categories -> {
-                // Already on categories screen
-            }
-            R.id.nav_settings -> {
-                startActivity(
-                        Intent(
-                                this,
-                                com.example.budgetdeluminator.ui.settings.SettingsActivity::class
-                                        .java
-                        )
-                )
-                finish()
-            }
-        }
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    private fun setupBackPressedHandler() {
-        onBackPressedDispatcher.addCallback(
-                this,
-                object : androidx.activity.OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                            binding.drawerLayout.closeDrawer(GravityCompat.START)
-                        } else {
-                            finish()
-                        }
-                    }
-                }
-        )
     }
 }

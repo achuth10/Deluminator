@@ -1,29 +1,20 @@
 package com.example.budgetdeluminator.ui.settings
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.MenuItem
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.budgetdeluminator.MainActivity
-import com.example.budgetdeluminator.R
 import com.example.budgetdeluminator.data.model.CurrencyManager
 import com.example.budgetdeluminator.databinding.ActivitySettingsBinding
 import com.example.budgetdeluminator.databinding.DialogCurrencySelectionBinding
 import com.example.budgetdeluminator.ui.adapter.CurrencyAdapter
-import com.example.budgetdeluminator.ui.categories.CategoriesActivity
 import com.example.budgetdeluminator.utils.CurrencyPreferences
-import com.google.android.material.navigation.NavigationView
 
-class SettingsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
-    private lateinit var drawerToggle: ActionBarDrawerToggle
     private lateinit var currencyPreferences: CurrencyPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,9 +25,7 @@ class SettingsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         currencyPreferences = CurrencyPreferences(this)
 
         setupToolbar()
-        setupNavigationDrawer()
         setupCurrencySettings()
-        setupBackPressedHandler()
     }
 
     private fun setupToolbar() {
@@ -44,22 +33,9 @@ class SettingsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
 
-    private fun setupNavigationDrawer() {
-        drawerToggle =
-                ActionBarDrawerToggle(
-                        this,
-                        binding.drawerLayout,
-                        binding.toolbar,
-                        R.string.app_name,
-                        R.string.app_name
-                )
-        binding.drawerLayout.addDrawerListener(drawerToggle)
-        drawerToggle.syncState()
-
-        binding.navigationView.setNavigationItemSelectedListener(this)
-
-        // Set the current menu item as selected
-        binding.navigationView.setCheckedItem(R.id.nav_settings)
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
     }
 
     private fun setupCurrencySettings() {
@@ -132,46 +108,5 @@ class SettingsActivity : AppCompatActivity(), NavigationView.OnNavigationItemSel
         )
 
         dialog.show()
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.nav_home -> {
-                startActivity(Intent(this, MainActivity::class.java))
-                finish()
-            }
-            R.id.nav_categories -> {
-                startActivity(Intent(this, CategoriesActivity::class.java))
-                finish()
-            }
-            R.id.nav_settings -> {
-                // Already on settings screen
-            }
-        }
-        binding.drawerLayout.closeDrawer(GravityCompat.START)
-        return true
-    }
-
-    private fun setupBackPressedHandler() {
-        onBackPressedDispatcher.addCallback(
-                this,
-                object : androidx.activity.OnBackPressedCallback(true) {
-                    override fun handleOnBackPressed() {
-                        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                            binding.drawerLayout.closeDrawer(GravityCompat.START)
-                        } else {
-                            finish()
-                        }
-                    }
-                }
-        )
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return if (drawerToggle.onOptionsItemSelected(item)) {
-            true
-        } else {
-            super.onOptionsItemSelected(item)
-        }
     }
 }
