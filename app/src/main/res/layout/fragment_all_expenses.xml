@@ -30,38 +30,19 @@
                 android:textColor="?attr/primaryTextColor"
                 android:layout_marginBottom="12dp" />
 
-            <LinearLayout
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/tvDateRange"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/tvDateRange"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Last 30 days"
-                    android:textSize="14sp"
-                    android:textColor="?attr/secondaryTextColor"
-                    android:gravity="start|center_vertical"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:drawableEnd="@android:drawable/arrow_down_float"
-                    android:drawableTint="?attr/secondaryTextColor" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnCustomDateRange"
-                    style="@style/Widget.Material3.Button.TextButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Custom"
-                    android:textSize="12sp"
-                    android:drawableStart="@android:drawable/ic_menu_my_calendar"
-                    android:drawableTint="@color/info_color" />
-
-            </LinearLayout>
+                android:text="Last 30 days"
+                android:textSize="14sp"
+                android:textColor="?attr/secondaryTextColor"
+                android:gravity="start|center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:drawableEnd="@android:drawable/arrow_down_float"
+                android:drawableTint="?attr/secondaryTextColor" />
 
             <!-- Summary for filtered period -->
             <LinearLayout

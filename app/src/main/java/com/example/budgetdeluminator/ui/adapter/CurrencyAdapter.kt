@@ -41,7 +41,6 @@ class CurrencyAdapter(
             binding.apply {
                 tvCurrencySymbol.text = currency.symbol
                 tvCurrencyName.text = currency.name
-                tvCurrencyCode.text = currency.code
                 tvCurrencyCountry.text = currency.country
 
                 // Show selection indicator

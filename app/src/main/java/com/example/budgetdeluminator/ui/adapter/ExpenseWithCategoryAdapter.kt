@@ -50,7 +50,12 @@ class ExpenseWithCategoryAdapter(
 
             binding.apply {
                 // Expense information
-                tvExpenseDescription.text = expense.description.ifEmpty { "Expense" }
+                if (expense.description.isNotEmpty()) {
+                    tvExpenseDescription.text = expense.description
+                    tvExpenseDescription.visibility = android.view.View.VISIBLE
+                } else {
+                    tvExpenseDescription.visibility = android.view.View.GONE
+                }
                 tvExpenseAmount.text = currencyPreferences.formatAmount(expense.amount)
 
                 // Category information

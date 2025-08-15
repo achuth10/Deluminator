@@ -7,36 +7,71 @@
     style="@style/NeumorphicCardStyle"
     android:layout_marginTop="0dp">
 
-    <LinearLayout
+        <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:padding="16dp">
 
+        <!-- Action buttons aligned to top right -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:id="@+id/layoutActionButtons"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/btnEditCategory"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_edit"
+                android:contentDescription="Edit category"
+                android:padding="6dp"
+                android:tint="@android:color/white"
+                android:alpha="0.9"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnDeleteCategory"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_delete"
+                android:contentDescription="Delete category"
+                android:padding="6dp"
+                android:tint="@android:color/white"
+                android:alpha="0.8" />
+
+        </LinearLayout>
+
+        <!-- Content area -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/layoutActionButtons"
+            android:layout_centerVertical="true"
+            android:orientation="vertical"
+            android:layout_marginEnd="12dp">
 
             <TextView
                 android:id="@+id/tvCategoryName"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Food &amp; Dining"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="?attr/primaryTextColor"
+                android:textColor="@android:color/white"
                 android:layout_marginBottom="4dp" />
 
             <TextView
                 android:id="@+id/tvBudgetLimit"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Budget: $500.00"
-                android:textColor="?attr/secondaryTextColor"
+                android:textColor="@android:color/white"
+                android:alpha="0.9"
                 android:maxLines="1"
                 android:autoSizeTextType="uniform"
                 android:autoSizeMinTextSize="12sp"
@@ -45,35 +80,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEditCategory"
-                style="@style/NeumorphicTextButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Edit"
-                android:textSize="12sp"
-                android:minWidth="60dp"
-                android:minHeight="36dp"
-                android:layout_marginEnd="8dp" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnDeleteCategory"
-                style="@style/NeumorphicTextButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Delete"
-                android:textColor="@color/error_color"
-                android:textSize="12sp"
-                android:minWidth="60dp"
-                android:minHeight="36dp" />
-
-        </LinearLayout>
-
-    </LinearLayout>
+    </RelativeLayout>
 
 </com.google.android.material.card.MaterialCardView>

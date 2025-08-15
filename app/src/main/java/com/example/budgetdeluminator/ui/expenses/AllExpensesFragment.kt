@@ -12,8 +12,8 @@ import com.example.budgetdeluminator.data.entity.Expense
 import com.example.budgetdeluminator.data.model.ExpenseWithCategory
 import com.example.budgetdeluminator.databinding.FragmentAllExpensesBinding
 import com.example.budgetdeluminator.ui.adapter.GroupedExpenseAdapter
-import com.example.budgetdeluminator.utils.ExpenseGroupingUtils
 import com.example.budgetdeluminator.utils.CurrencyPreferences
+import com.example.budgetdeluminator.utils.ExpenseGroupingUtils
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -85,12 +85,11 @@ class AllExpensesFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.tvDateRange.setOnClickListener { showQuickDateRangeOptions() }
-
-        binding.btnCustomDateRange.setOnClickListener { showCustomDateRangePicker() }
     }
 
     private fun setupObservers() {
-        expensesViewModel.allExpensesWithCategory.observe(viewLifecycleOwner) { allExpensesWithCategory ->
+        expensesViewModel.allExpensesWithCategory.observe(viewLifecycleOwner) {
+                allExpensesWithCategory ->
             val filteredExpenses = filterExpensesByDateRange(allExpensesWithCategory)
 
             if (filteredExpenses.isEmpty()) {
@@ -99,7 +98,7 @@ class AllExpensesFragment : Fragment() {
             } else {
                 binding.recyclerViewAllExpenses.visibility = View.VISIBLE
                 binding.layoutEmptyState.visibility = View.GONE
-                
+
                 // Group expenses by date and submit to adapter
                 val groupedExpenses = ExpenseGroupingUtils.groupExpensesByDate(filteredExpenses)
                 expenseAdapter.submitList(groupedExpenses)
@@ -109,10 +108,13 @@ class AllExpensesFragment : Fragment() {
         }
     }
 
-    private fun filterExpensesByDateRange(expensesWithCategory: List<ExpenseWithCategory>): List<ExpenseWithCategory> {
+    private fun filterExpensesByDateRange(
+            expensesWithCategory: List<ExpenseWithCategory>
+    ): List<ExpenseWithCategory> {
         return expensesWithCategory
                 .filter { expenseWithCategory ->
-                    expenseWithCategory.expense.createdAt >= startDate && expenseWithCategory.expense.createdAt <= endDate
+                    expenseWithCategory.expense.createdAt >= startDate &&
+                            expenseWithCategory.expense.createdAt <= endDate
                 }
                 .sortedByDescending { it.expense.createdAt }
     }
@@ -143,24 +145,29 @@ class AllExpensesFragment : Fragment() {
     }
 
     private fun showQuickDateRangeOptions() {
-        val options = arrayOf("Last 7 days", "Last 30 days", "Last 3 months", "This year")
+        val options = arrayOf("Last 7 days", "Last 30 days", "Last 3 months", "This year", "Custom")
 
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
                 .setTitle("Select Date Range")
                 .setItems(options) { _, which ->
-                    val calendar = Calendar.getInstance()
-                    endDate = calendar.timeInMillis
-
                     when (which) {
-                        0 -> calendar.add(Calendar.DAY_OF_MONTH, -7)
-                        1 -> calendar.add(Calendar.DAY_OF_MONTH, -30)
-                        2 -> calendar.add(Calendar.MONTH, -3)
-                        3 -> calendar.set(Calendar.DAY_OF_YEAR, 1)
-                    }
+                        0, 1, 2, 3 -> {
+                            val calendar = Calendar.getInstance()
+                            endDate = calendar.timeInMillis
 
-                    startDate = calendar.timeInMillis
-                    updateDateRangeDisplay()
-                    setupObservers() // Refresh data
+                            when (which) {
+                                0 -> calendar.add(Calendar.DAY_OF_MONTH, -7)
+                                1 -> calendar.add(Calendar.DAY_OF_MONTH, -30)
+                                2 -> calendar.add(Calendar.MONTH, -3)
+                                3 -> calendar.set(Calendar.DAY_OF_YEAR, 1)
+                            }
+
+                            startDate = calendar.timeInMillis
+                            updateDateRangeDisplay()
+                            setupObservers() // Refresh data
+                        }
+                        4 -> showCustomDateRangePicker() // Custom option
+                    }
                 }
                 .show()
     }

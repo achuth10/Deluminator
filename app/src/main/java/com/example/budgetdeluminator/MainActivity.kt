@@ -578,8 +578,7 @@ class MainActivity :
         // Save button
         dialogBinding.btnSaveExpense.setOnClickListener {
             selectedCategory?.let { category ->
-                val description =
-                        dialogBinding.etExpenseNote.text.toString().trim().ifEmpty { "Expense" }
+                val description = dialogBinding.etExpenseNote.text.toString().trim()
                 val expense =
                         Expense(
                                 categoryId = category.id,
@@ -588,7 +587,6 @@ class MainActivity :
                                 createdAt = selectedDate
                         )
                 expensesViewModel.insertExpense(expense)
-                Toast.makeText(this, "Expense added successfully", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             }
                     ?: run {
@@ -733,8 +731,7 @@ class MainActivity :
         // Save button
         dialogBinding.btnSaveExpense.setOnClickListener {
             selectedCategory?.let { category ->
-                val description =
-                        dialogBinding.etExpenseNote.text.toString().trim().ifEmpty { "Expense" }
+                val description = dialogBinding.etExpenseNote.text.toString().trim()
                 val amountText = dialogBinding.tvExpenseAmount.text.toString()
 
                 // Extract amount from formatted text
@@ -753,7 +750,6 @@ class MainActivity :
                                 createdAt = selectedDate
                         )
                 expensesViewModel.updateExpense(updatedExpense)
-                Toast.makeText(this, "Expense updated successfully", Toast.LENGTH_SHORT).show()
                 dialog.dismiss()
             }
                     ?: run {
@@ -810,10 +806,7 @@ class MainActivity :
         AlertDialog.Builder(this)
                 .setTitle("Delete Expense")
                 .setMessage("Are you sure you want to delete this expense?")
-                .setPositiveButton("Delete") { _, _ ->
-                    expensesViewModel.deleteExpense(expense)
-                    Toast.makeText(this, "Expense deleted", Toast.LENGTH_SHORT).show()
-                }
+                .setPositiveButton("Delete") { _, _ -> expensesViewModel.deleteExpense(expense) }
                 .setNegativeButton("Cancel", null)
                 .show()
     }
@@ -938,10 +931,7 @@ class MainActivity :
         androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Delete Expense")
                 .setMessage("Are you sure you want to delete this expense?")
-                .setPositiveButton("Delete") { _, _ ->
-                    expensesViewModel.deleteExpense(expense)
-                    Toast.makeText(this, "Expense deleted", Toast.LENGTH_SHORT).show()
-                }
+                .setPositiveButton("Delete") { _, _ -> expensesViewModel.deleteExpense(expense) }
                 .setNegativeButton("Cancel", null)
                 .show()
     }

@@ -104,17 +104,14 @@
 
                             <TextView
                                 android:id="@+id/tvSelectedCurrency"
-                                android:layout_width="0dp"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
                                 android:text="Indian Rupee (₹)"
+                                android:textSize="16sp"
                                 android:textStyle="bold"
                                 android:textColor="?attr/primaryTextColor"
                                 android:maxLines="1"
-                                android:autoSizeTextType="uniform"
-                                android:autoSizeMinTextSize="14sp"
-                                android:autoSizeMaxTextSize="18sp"
-                                android:autoSizeStepGranularity="1sp" />
+                                android:ellipsize="end" />
 
                         </LinearLayout>
 

@@ -92,7 +92,12 @@ class GroupedExpenseAdapter(
             binding.apply {
                 // Category information
                 tvCategoryName.text = category.name
-                tvExpenseDescription.text = expense.description.ifEmpty { category.name }
+                if (expense.description.isNotEmpty()) {
+                    tvExpenseDescription.text = expense.description
+                    tvExpenseDescription.visibility = android.view.View.VISIBLE
+                } else {
+                    tvExpenseDescription.visibility = android.view.View.GONE
+                }
                 tvExpenseAmount.text = currencyPreferences.formatAmount(expense.amount)
 
                 // Set card background color based on category color

@@ -35,26 +35,12 @@
 
             <TextView
                 android:id="@+id/tvCurrencyName"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:text="Indian Rupee"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="?attr/primaryTextColor" />
-
-            <TextView
-                android:id="@+id/tvCurrencyCode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="INR"
-                android:textSize="12sp"
-                android:textStyle="bold"
-                android:textColor="?attr/primaryTextColor"
-                android:background="@color/design_default_color_primary"
-                android:paddingHorizontal="8dp"
-                android:paddingVertical="2dp"
-                android:layout_marginStart="8dp" />
 
         </LinearLayout>
 

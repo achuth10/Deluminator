@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -71,6 +72,9 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         categoriesViewModel.allCategories.observe(this) { categories ->
             categoryAdapter.submitList(categories)
         }
+
+        // Fix any existing categories with missing colors
+        categoriesViewModel.fixMissingColors()
     }
 
     private fun setupClickListeners() {
@@ -80,10 +84,52 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     private fun showAddCategoryDialog(categoryToEdit: BudgetCategory? = null) {
         val dialogBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(this))
 
+        // Available color options
+        val colorOptions =
+                arrayOf(
+                        "#4CAF50",
+                        "#2196F3",
+                        "#FF9800",
+                        "#E91E63",
+                        "#9C27B0",
+                        "#FF5722",
+                        "#00BCD4",
+                        "#3F51B5",
+                        "#FFC107",
+                        "#795548"
+                )
+        var selectedColor = categoryToEdit?.color?.takeIf { it.isNotEmpty() } ?: "#4CAF50"
+
         // Pre-fill if editing
         categoryToEdit?.let { category ->
             dialogBinding.etCategoryName.setText(category.name)
             dialogBinding.etBudgetLimit.setText(category.budgetLimit.toString())
+            selectedColor = category.color
+        }
+
+        // Setup color picker click listeners
+        val colorViews =
+                arrayOf(
+                        dialogBinding.colorOption1,
+                        dialogBinding.colorOption2,
+                        dialogBinding.colorOption3,
+                        dialogBinding.colorOption4,
+                        dialogBinding.colorOption5,
+                        dialogBinding.colorOption6,
+                        dialogBinding.colorOption7,
+                        dialogBinding.colorOption8,
+                        dialogBinding.colorOption9,
+                        dialogBinding.colorOption10
+                )
+
+        // Initialize color selection highlighting
+        updateColorSelection(colorViews, colorOptions, selectedColor)
+
+        colorViews.forEachIndexed { index, colorView ->
+            colorView.setOnClickListener {
+                selectedColor = colorOptions[index]
+                updateColorSelection(colorViews, colorOptions, selectedColor)
+            }
         }
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
@@ -108,20 +154,73 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             if (categoryToEdit == null) {
                 // Adding new category
-                val newCategory = BudgetCategory(name = name, budgetLimit = budgetLimit)
+                val newCategory =
+                        BudgetCategory(
+                                name = name,
+                                budgetLimit = budgetLimit,
+                                color = selectedColor
+                        )
                 categoriesViewModel.insertCategory(newCategory)
-                Toast.makeText(this, "Category added successfully", Toast.LENGTH_SHORT).show()
             } else {
                 // Editing existing category
-                val updatedCategory = categoryToEdit.copy(name = name, budgetLimit = budgetLimit)
+                val updatedCategory =
+                        categoryToEdit.copy(
+                                name = name,
+                                budgetLimit = budgetLimit,
+                                color = selectedColor
+                        )
                 categoriesViewModel.updateCategory(updatedCategory)
-                Toast.makeText(this, "Category updated successfully", Toast.LENGTH_SHORT).show()
             }
 
             dialog.dismiss()
         }
 
         dialog.show()
+    }
+
+    private fun updateColorSelection(
+            colorViews: Array<View>,
+            colorOptions: Array<String>,
+            selectedColor: String
+    ) {
+        colorViews.forEachIndexed { index, colorView ->
+            val isSelected = colorOptions[index] == selectedColor
+            val drawableRes =
+                    when (colorOptions[index]) {
+                        "#4CAF50" ->
+                                if (isSelected) R.drawable.color_circle_green_selected
+                                else R.drawable.color_circle_green
+                        "#2196F3" ->
+                                if (isSelected) R.drawable.color_circle_blue_selected
+                                else R.drawable.color_circle_blue
+                        "#FF9800" ->
+                                if (isSelected) R.drawable.color_circle_orange_selected
+                                else R.drawable.color_circle_orange
+                        "#E91E63" ->
+                                if (isSelected) R.drawable.color_circle_pink_selected
+                                else R.drawable.color_circle_pink
+                        "#9C27B0" ->
+                                if (isSelected) R.drawable.color_circle_purple_selected
+                                else R.drawable.color_circle_purple
+                        "#FF5722" ->
+                                if (isSelected) R.drawable.color_circle_red_selected
+                                else R.drawable.color_circle_red
+                        "#00BCD4" ->
+                                if (isSelected) R.drawable.color_circle_teal_selected
+                                else R.drawable.color_circle_teal
+                        "#3F51B5" ->
+                                if (isSelected) R.drawable.color_circle_indigo_selected
+                                else R.drawable.color_circle_indigo
+                        "#FFC107" ->
+                                if (isSelected) R.drawable.color_circle_amber_selected
+                                else R.drawable.color_circle_amber
+                        "#795548" ->
+                                if (isSelected) R.drawable.color_circle_brown_selected
+                                else R.drawable.color_circle_brown
+                        else -> R.drawable.color_circle_green
+                    }
+            colorView.setBackgroundResource(drawableRes)
+        }
     }
 
     private fun showDeleteCategoryDialog(category: BudgetCategory) {
@@ -132,7 +231,6 @@ class CategoriesActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
                 )
                 .setPositiveButton("Delete") { _, _ ->
                     categoriesViewModel.deleteCategory(category)
-                    Toast.makeText(this, "Category deleted", Toast.LENGTH_SHORT).show()
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
