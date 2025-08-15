@@ -4,67 +4,75 @@
     style="@style/NeumorphicCardStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="12dp"
-    android:layout_marginTop="0dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginEnd="8dp">
+    android:layout_margin="@dimen/card_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/card_padding">
 
-        <!-- Category Name -->
-        <TextView
-            android:id="@+id/tvCategoryName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Food &amp; Dining"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="?attr/primaryTextColor"
-            android:maxLines="1"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:layout_marginBottom="12dp" />
-
-        <!-- Spent vs Remaining -->
+        <!-- Category Name and Budget Info - Horizontal Layout -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="@dimen/spacing_small">
 
-            <LinearLayout
+            <!-- Category Name -->
+            <TextView
+                android:id="@+id/tvCategoryName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:text="Food &amp; Dining"
+                android:textAppearance="?attr/textAppearanceHeadline6"
+                android:textStyle="bold"
+                android:textColor="?attr/primaryTextColor"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:gravity="start|center_vertical" />
+
+            <!-- Spent and Remaining - Vertical Layout -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end">
+
+            <!-- Spent -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end"
+                android:layout_marginBottom="@dimen/spacing_tiny">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Spent"
-                    android:textSize="11sp"
+                    android:textAppearance="?attr/textAppearanceCaption"
                     android:textColor="?attr/secondaryTextColor"
-                    android:layout_marginBottom="2dp" />
+                    android:layout_marginBottom="@dimen/spacing_micro" />
 
                 <TextView
                     android:id="@+id/tvSpentAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="₹320"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBody2"
                     android:textStyle="bold"
                     android:textColor="?attr/primaryTextColor" />
 
             </LinearLayout>
 
+            <!-- Remaining -->
             <LinearLayout
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:orientation="vertical"
                 android:gravity="end">
 
@@ -72,20 +80,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Left"
-                    android:textSize="11sp"
+                    android:textAppearance="?attr/textAppearanceCaption"
                     android:textColor="?attr/secondaryTextColor"
-                    android:layout_marginBottom="2dp" />
+                    android:layout_marginBottom="@dimen/spacing_micro" />
 
                 <TextView
                     android:id="@+id/tvRemainingAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="₹180"
-                    android:textSize="14sp"
+                    android:textAppearance="?attr/textAppearanceBody2"
                     android:textStyle="bold"
                     android:textColor="?attr/primaryTextColor" />
 
             </LinearLayout>
+
+        </LinearLayout>
 
         </LinearLayout>
 
@@ -94,7 +104,7 @@
             android:id="@+id/progressBarCategory"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="8dp"
+            android:layout_height="@dimen/progress_bar_height"
             android:progress="64"
             android:progressTint="@color/success_color"
             android:progressBackgroundTint="?attr/progressBackgroundColor" />

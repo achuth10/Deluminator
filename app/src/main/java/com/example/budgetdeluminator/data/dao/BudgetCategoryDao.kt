@@ -21,7 +21,4 @@ interface BudgetCategoryDao {
     @Delete suspend fun deleteCategory(category: BudgetCategory)
 
     @Query("DELETE FROM budget_categories WHERE id = :id") suspend fun deleteCategoryById(id: Long)
-
-    @Query("UPDATE budget_categories SET color = '#4CAF50' WHERE color IS NULL OR color = ''")
-    suspend fun fixMissingColors()
 }

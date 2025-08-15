@@ -69,97 +69,119 @@
 
 
 
-                <!-- Budget Summary - Horizontal Layout -->
+                <!-- Budget Summary - Left/Right Layout with Dividers -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="16dp">
+                    android:orientation="vertical"
+                    android:layout_marginBottom="12dp">
 
                     <!-- Total -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="4dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Total"
-                            android:textSize="14sp"
+                            android:layout_weight="1"
+                            android:text="Total Budget"
+                            android:textSize="15sp"
                             android:textColor="?attr/secondaryTextColor"
-                            android:layout_marginBottom="4dp" />
+                            android:gravity="start" />
 
                         <TextView
                             android:id="@+id/tvTotalBudget"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="$0"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="?attr/primaryTextColor"
                             android:maxLines="1"
-                            android:gravity="center" />
+                            android:gravity="end" />
 
                     </LinearLayout>
 
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorSurfaceVariant"
+                        android:layout_marginHorizontal="4dp"
+                        android:alpha="0.3" />
+
                     <!-- Spent -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="4dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Spent"
-                            android:textSize="14sp"
+                            android:layout_weight="1"
+                            android:text="Total Spent"
+                            android:textSize="15sp"
                             android:textColor="?attr/secondaryTextColor"
-                            android:layout_marginBottom="4dp" />
+                            android:gravity="start" />
 
                         <TextView
                             android:id="@+id/tvTotalSpent"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="$0"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="?attr/primaryTextColor"
                             android:maxLines="1"
-                            android:gravity="center" />
+                            android:gravity="end" />
 
                     </LinearLayout>
 
-                    <!-- Left -->
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="?attr/colorSurfaceVariant"
+                        android:layout_marginHorizontal="4dp"
+                        android:alpha="0.3" />
+
+                    <!-- Remaining -->
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:gravity="center">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingVertical="8dp"
+                        android:paddingHorizontal="4dp">
 
                         <TextView
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Left"
-                            android:textSize="14sp"
+                            android:layout_weight="1"
+                            android:text="Remaining"
+                            android:textSize="15sp"
                             android:textColor="?attr/secondaryTextColor"
-                            android:layout_marginBottom="4dp" />
+                            android:gravity="start" />
 
                         <TextView
                             android:id="@+id/tvRemaining"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="$0"
-                            android:textSize="20sp"
+                            android:textSize="18sp"
                             android:textStyle="bold"
                             android:textColor="?attr/primaryTextColor"
                             android:maxLines="1"
-                            android:gravity="center" />
+                            android:gravity="end" />
 
                     </LinearLayout>
 

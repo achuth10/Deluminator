@@ -7,13 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.budgetdeluminator.R
 import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.databinding.DialogAddCategoryBinding
 import com.example.budgetdeluminator.databinding.FragmentCategoriesBinding
 import com.example.budgetdeluminator.ui.adapter.CategoryManagementAdapter
+import kotlinx.coroutines.launch
 
 class CategoriesFragment : Fragment() {
 
@@ -22,7 +24,7 @@ class CategoriesFragment : Fragment() {
                 get() = _binding!!
 
         private lateinit var categoryAdapter: CategoryManagementAdapter
-        private val categoriesViewModel: CategoriesViewModel by viewModels()
+        private val categoriesViewModel: CategoriesViewModel by activityViewModels()
 
         override fun onCreateView(
                 inflater: LayoutInflater,
@@ -74,8 +76,27 @@ class CategoriesFragment : Fragment() {
                         }
                 }
 
-                // Fix any existing categories with missing colors
-                categoriesViewModel.fixMissingColors()
+                // Observe operation results for error feedback only
+                categoriesViewModel.operationResult.observe(viewLifecycleOwner) { result ->
+                        result?.let {
+                                when (it) {
+                                        is CategoriesViewModel.OperationResult.Error -> {
+                                                Toast.makeText(
+                                                                requireContext(),
+                                                                it.message,
+                                                                Toast.LENGTH_LONG
+                                                        )
+                                                        .show()
+                                        }
+                                        is CategoriesViewModel.OperationResult.Success -> {
+                                                // Success - no toast needed, UI updates
+                                                // automatically
+                                        }
+                                }
+                                // Clear the result after handling it
+                                categoriesViewModel.clearOperationResult()
+                        }
+                }
         }
 
         private fun setupClickListeners() {
@@ -153,11 +174,33 @@ class CategoriesFragment : Fragment() {
                                 return@setOnClickListener
                         }
 
+                        // Validate name length
+                        if (name.length > 50) {
+                                Toast.makeText(
+                                                requireContext(),
+                                                "Category name must be 50 characters or less",
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                return@setOnClickListener
+                        }
+
                         val budgetLimit = budgetLimitText.toDoubleOrNull()
                         if (budgetLimit == null || budgetLimit <= 0) {
                                 Toast.makeText(
                                                 requireContext(),
                                                 "Please enter a valid budget amount",
+                                                Toast.LENGTH_SHORT
+                                        )
+                                        .show()
+                                return@setOnClickListener
+                        }
+
+                        // Validate budget limit range
+                        if (budgetLimit > 999999.99) {
+                                Toast.makeText(
+                                                requireContext(),
+                                                "Budget amount cannot exceed $999,999.99",
                                                 Toast.LENGTH_SHORT
                                         )
                                         .show()
@@ -245,15 +288,25 @@ class CategoriesFragment : Fragment() {
         }
 
         private fun showDeleteCategoryDialog(category: BudgetCategory) {
-                AlertDialog.Builder(requireContext())
-                        .setTitle("Delete Category")
-                        .setMessage(
-                                "Are you sure you want to delete '${category.name}'? This will also delete all associated expenses."
-                        )
-                        .setPositiveButton("Delete") { _, _ ->
-                                categoriesViewModel.deleteCategory(category)
-                        }
-                        .setNegativeButton("Cancel", null)
-                        .show()
+                // Get expense count first, then show dialog
+                lifecycleScope.launch {
+                        val expenseCount = categoriesViewModel.getCategoryExpenseCount(category.id)
+
+                        val message =
+                                if (expenseCount > 0) {
+                                        "Are you sure you want to delete '${category.name}'? This will also delete $expenseCount associated expense(s). This action cannot be undone."
+                                } else {
+                                        "Are you sure you want to delete '${category.name}'? This action cannot be undone."
+                                }
+
+                        AlertDialog.Builder(requireContext())
+                                .setTitle("Delete Category")
+                                .setMessage(message)
+                                .setPositiveButton("Delete") { _, _ ->
+                                        categoriesViewModel.deleteCategory(category)
+                                }
+                                .setNegativeButton("Cancel", null)
+                                .show()
+                }
         }
 }

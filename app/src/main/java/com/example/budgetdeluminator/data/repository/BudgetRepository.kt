@@ -34,13 +34,19 @@ class BudgetRepository(
                 withContext(Dispatchers.IO) { budgetCategoryDao.updateCategory(category) }
 
         suspend fun deleteCategory(category: BudgetCategory) =
-                withContext(Dispatchers.IO) { budgetCategoryDao.deleteCategory(category) }
+                withContext(Dispatchers.IO) {
+                        // The foreign key cascade will automatically delete related expenses
+                        budgetCategoryDao.deleteCategory(category)
+                }
 
         suspend fun deleteCategoryById(id: Long) =
-                withContext(Dispatchers.IO) { budgetCategoryDao.deleteCategoryById(id) }
+                withContext(Dispatchers.IO) {
+                        // The foreign key cascade will automatically delete related expenses
+                        budgetCategoryDao.deleteCategoryById(id)
+                }
 
-        suspend fun fixMissingColors() =
-                withContext(Dispatchers.IO) { budgetCategoryDao.fixMissingColors() }
+        suspend fun getCategoryExpenseCount(categoryId: Long): Int =
+                withContext(Dispatchers.IO) { expenseDao.getExpenseCountByCategory(categoryId) }
 
         // Expense operations
         fun getAllExpenses(): LiveData<List<Expense>> = expenseDao.getAllExpenses()
