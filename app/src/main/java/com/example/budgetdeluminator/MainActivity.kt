@@ -17,6 +17,7 @@ import com.example.budgetdeluminator.data.entity.RecurrenceType
 import com.example.budgetdeluminator.data.entity.RecurringExpense
 import com.example.budgetdeluminator.data.model.CategoryWithExpenses
 import com.example.budgetdeluminator.databinding.ActivityMainBinding
+import com.example.budgetdeluminator.databinding.DialogAddCategoryBinding
 import com.example.budgetdeluminator.databinding.DialogAddExpenseBinding
 import com.example.budgetdeluminator.databinding.DialogAddRecurringExpenseBinding
 import com.example.budgetdeluminator.databinding.DialogCalculatorBinding
@@ -81,6 +82,16 @@ class MainActivity :
     private lateinit var categoriesFragment: CategoriesFragment
     private lateinit var recurringExpensesFragment: RecurringExpensesFragment
 
+    // Track current fragment for FAB behavior
+    private var currentFragmentType: FragmentType = FragmentType.HOME
+
+    enum class FragmentType {
+        HOME,
+        ALL_EXPENSES,
+        CATEGORIES,
+        RECURRING_EXPENSES
+    }
+
     private var hasShownBackgroundPermissionDialog = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -122,25 +133,29 @@ class MainActivity :
                 R.id.nav_home -> {
                     replaceFragment(homeFragment)
                     supportActionBar?.title = "Budget Overview"
+                    currentFragmentType = FragmentType.HOME
                     binding.fabAddExpense.show()
                     true
                 }
                 R.id.nav_all_expenses -> {
                     replaceFragment(allExpensesFragment)
                     supportActionBar?.title = "All Expenses"
+                    currentFragmentType = FragmentType.ALL_EXPENSES
                     binding.fabAddExpense.show()
                     true
                 }
                 R.id.nav_categories -> {
                     replaceFragment(categoriesFragment)
                     supportActionBar?.title = "Categories"
-                    binding.fabAddExpense.hide()
+                    currentFragmentType = FragmentType.CATEGORIES
+                    binding.fabAddExpense.show()
                     true
                 }
                 R.id.nav_recurring_expenses -> {
                     replaceFragment(recurringExpensesFragment)
                     supportActionBar?.title = "Recurring Expenses"
-                    binding.fabAddExpense.hide()
+                    currentFragmentType = FragmentType.RECURRING_EXPENSES
+                    binding.fabAddExpense.show()
                     true
                 }
                 else -> false
@@ -159,7 +174,13 @@ class MainActivity :
     }
 
     private fun setupClickListeners() {
-        binding.fabAddExpense.setOnClickListener { startExpenseEntryFlow() }
+        binding.fabAddExpense.setOnClickListener {
+            when (currentFragmentType) {
+                FragmentType.HOME, FragmentType.ALL_EXPENSES -> startExpenseEntryFlow()
+                FragmentType.CATEGORIES -> showAddCategoryDialog()
+                FragmentType.RECURRING_EXPENSES -> showAddRecurringExpenseDialog()
+            }
+        }
         binding.fabAddExpense.setOnLongClickListener {
             startActivity(
                     Intent(
@@ -564,12 +585,6 @@ class MainActivity :
                             ) {
                                 expensesViewModel.insertExpense(expense)
                                 dialog.dismiss()
-                                Toast.makeText(
-                                                this,
-                                                Constants.SUCCESS_EXPENSE_SAVED,
-                                                Toast.LENGTH_SHORT
-                                        )
-                                        .show()
                             }
                         }
                     }
@@ -792,12 +807,6 @@ class MainActivity :
                             ) {
                                 expensesViewModel.updateExpense(updatedExpense)
                                 dialog.dismiss()
-                                Toast.makeText(
-                                                this,
-                                                Constants.SUCCESS_EXPENSE_UPDATED,
-                                                Toast.LENGTH_SHORT
-                                        )
-                                        .show()
                             }
                         }
                     }
@@ -898,6 +907,115 @@ class MainActivity :
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
+    }
+
+    // Category Dialog Methods
+    private fun showAddCategoryDialog(categoryToEdit: BudgetCategory? = null) {
+        val dialogBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(this))
+
+        // Available color options
+        val colorOptions =
+                arrayOf(
+                        "#4CAF50",
+                        "#2196F3",
+                        "#FF9800",
+                        "#E91E63",
+                        "#9C27B0",
+                        "#FF5722",
+                        "#00BCD4",
+                        "#3F51B5",
+                        "#FFC107",
+                        "#795548"
+                )
+        var selectedColor = categoryToEdit?.color?.takeIf { it.isNotEmpty() } ?: "#4CAF50"
+
+        // Pre-fill if editing
+        categoryToEdit?.let { category ->
+            dialogBinding.etCategoryName.setText(category.name)
+            dialogBinding.etBudgetLimit.setText(category.budgetLimit.toString())
+            selectedColor = category.color
+        }
+
+        // Setup color picker
+        val colorViews =
+                arrayOf(
+                        dialogBinding.colorOption1,
+                        dialogBinding.colorOption2,
+                        dialogBinding.colorOption3,
+                        dialogBinding.colorOption4,
+                        dialogBinding.colorOption5,
+                        dialogBinding.colorOption6,
+                        dialogBinding.colorOption7,
+                        dialogBinding.colorOption8,
+                        dialogBinding.colorOption9,
+                        dialogBinding.colorOption10
+                )
+
+        fun updateColorSelection() {
+            colorViews.forEachIndexed { index, colorView ->
+                val isSelected = colorOptions[index] == selectedColor
+                colorView.alpha = if (isSelected) 1.0f else 0.5f
+                colorView.scaleX = if (isSelected) 1.1f else 1.0f
+                colorView.scaleY = if (isSelected) 1.1f else 1.0f
+            }
+        }
+
+        updateColorSelection()
+
+        colorViews.forEachIndexed { index, colorView ->
+            colorView.setOnClickListener {
+                selectedColor = colorOptions[index]
+                updateColorSelection()
+            }
+        }
+
+        val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+
+        dialogBinding.btnSave.setOnClickListener {
+            val name = dialogBinding.etCategoryName.text.toString().trim()
+            val budgetText = dialogBinding.etBudgetLimit.text.toString().trim()
+
+            if (name.isEmpty()) {
+                Toast.makeText(this, "Please enter a category name", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val budgetLimit = budgetText.toDoubleOrNull()
+            if (budgetLimit == null || budgetLimit <= 0) {
+                Toast.makeText(this, "Please enter a valid budget limit", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val category =
+                    categoryToEdit?.copy(
+                            name = name,
+                            budgetLimit = budgetLimit,
+                            color = selectedColor
+                    )
+                            ?: BudgetCategory(
+                                    name = name,
+                                    budgetLimit = budgetLimit,
+                                    color = selectedColor
+                            )
+
+            lifecycleScope.launchWhenStarted {
+                try {
+                    if (categoryToEdit != null) {
+                        categoriesViewModel.updateCategory(category)
+                    } else {
+                        categoriesViewModel.insertCategory(category)
+                    }
+                    dialog.dismiss()
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                            .show()
+                }
+            }
+        }
+
+        dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
     }
 
     // Recurring Expense Dialog Methods
@@ -1057,12 +1175,6 @@ class MainActivity :
                                     recurringExpensesViewModel.updateRecurringExpense(
                                             updatedExpense
                                     )
-                                    Toast.makeText(
-                                                    this,
-                                                    "Recurring expense updated",
-                                                    Toast.LENGTH_SHORT
-                                            )
-                                            .show()
                                 } else {
                                     // Create new
                                     val newExpense =
@@ -1074,12 +1186,6 @@ class MainActivity :
                                                     recurrenceValue = selectedRecurrenceValue
                                             )
                                     recurringExpensesViewModel.insertRecurringExpense(newExpense)
-                                    Toast.makeText(
-                                                    this,
-                                                    "Recurring expense created",
-                                                    Toast.LENGTH_SHORT
-                                            )
-                                            .show()
 
                                     // Check for background processing permissions after creating
                                     // first recurring expense

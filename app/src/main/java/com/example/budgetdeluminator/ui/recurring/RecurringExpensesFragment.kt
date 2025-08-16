@@ -75,10 +75,7 @@ class RecurringExpensesFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        binding.fabAddRecurringExpense.setOnClickListener {
-            // TODO: Show add recurring expense dialog
-            showAddRecurringExpenseDialog()
-        }
+        // FAB click listener removed - now handled by MainActivity
 
         binding.btnSyncRecurring.setOnClickListener { syncRecurringExpenses() }
 
@@ -163,14 +160,7 @@ class RecurringExpensesFragment : Fragment() {
                 val scheduler = RecurrenceScheduler(requireContext())
                 val generatedCount = scheduler.processRecurringExpensesManually()
 
-                val message =
-                        if (generatedCount > 0) {
-                            "Generated $generatedCount recurring expense${if (generatedCount == 1) "" else "s"}"
-                        } else {
-                            "No recurring expenses due"
-                        }
-
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                // Sync completed silently - no toast notification needed
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Sync failed: ${e.message}", Toast.LENGTH_SHORT)
                         .show()

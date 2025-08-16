@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    
+    <!-- Background circle with gradient -->
+    <path android:pathData="M24,24m-22,0a22,22 0,1 1,44 0a22,22 0,1 1,-44 0">
+        <aapt:attr name="android:fillColor" xmlns:aapt="http://schemas.android.com/aapt">
+            <gradient 
+                android:angle="135"
+                android:startColor="#FF6750A4"
+                android:centerColor="#FF8B5FBF"
+                android:endColor="#FFB06FE0"
+                android:type="linear"/>
+        </aapt:attr>
+    </path>
+    
+    <!-- Neumorphic highlight -->
+    <path android:pathData="M24,24m-20,0a20,20 0,1 1,40 0a20,20 0,1 1,-40 0"
+        android:fillColor="#15FFFFFF"/>
+    
+    <!-- Neumorphic shadow -->
+    <path android:pathData="M25,25m-19,0a19,19 0,1 1,38 0a19,19 0,1 1,-38 0"
+        android:fillColor="#08000000"/>
+    
+    <!-- Chart bars -->
+    <group android:translateX="24" android:translateY="26">
+        <path android:pathData="M-6,-4 L-4,-4 L-4,4 L-6,4 Z" android:fillColor="#FFFFFFFF"/>
+        <path android:pathData="M-2,-6 L0,-6 L0,4 L-2,4 Z" android:fillColor="#FFFFFFFF"/>
+        <path android:pathData="M2,-3 L4,-3 L4,4 L2,4 Z" android:fillColor="#FFFFFFFF"/>
+        <path android:pathData="M6,-5 L8,-5 L8,4 L6,4 Z" android:fillColor="#FFFFFFFF"/>
+    </group>
+    
+    <!-- Trending arrow -->
+    <group android:translateX="24" android:translateY="18">
+        <path android:pathData="M-2,2 L0,0 L2,2 M0,0 L0,4"
+            android:strokeColor="#FFFFFFFF"
+            android:strokeWidth="1.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round"/>
+    </group>
+</vector>

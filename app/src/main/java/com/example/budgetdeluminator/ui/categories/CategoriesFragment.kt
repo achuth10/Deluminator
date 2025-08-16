@@ -100,7 +100,7 @@ class CategoriesFragment : Fragment() {
         }
 
         private fun setupClickListeners() {
-                binding.fabAddCategory.setOnClickListener { showAddCategoryDialog() }
+                // FAB click listener removed - now handled by MainActivity
         }
 
         private fun showAddCategoryDialog(categoryToEdit: BudgetCategory? = null) {

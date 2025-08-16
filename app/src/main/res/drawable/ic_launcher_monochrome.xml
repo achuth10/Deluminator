@@ -14,22 +14,22 @@
         <group android:translateX="54" android:translateY="54">
             <!-- Bar 1 -->
             <path android:pathData="M-12,-8 L-8,-8 L-8,8 L-12,8 Z"
-                android:fillColor="#FFFFFFFF"/>
+                android:fillColor="#FF000000"/>
             <!-- Bar 2 -->
             <path android:pathData="M-4,-12 L0,-12 L0,8 L-4,8 Z"
-                android:fillColor="#FFFFFFFF"/>
+                android:fillColor="#FF000000"/>
             <!-- Bar 3 -->
             <path android:pathData="M4,-6 L8,-6 L8,8 L4,8 Z"
-                android:fillColor="#FFFFFFFF"/>
+                android:fillColor="#FF000000"/>
             <!-- Bar 4 -->
             <path android:pathData="M12,-10 L16,-10 L16,8 L12,8 Z"
-                android:fillColor="#FFFFFFFF"/>
+                android:fillColor="#FF000000"/>
         </group>
         
         <!-- Trending up arrow -->
         <group android:translateX="54" android:translateY="38">
             <path android:pathData="M-4,4 L0,0 L4,4 M0,0 L0,8"
-                android:strokeColor="#FFFFFFFF"
+                android:strokeColor="#FF000000"
                 android:strokeWidth="2"
                 android:strokeLineCap="round"
                 android:strokeLineJoin="round"/>
