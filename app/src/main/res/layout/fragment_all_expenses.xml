@@ -121,7 +121,7 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:src="@android:drawable/ic_menu_recent_history"
-            android:tint="?attr/secondaryTextColor"
+            app:tint="?attr/secondaryTextColor"
             android:layout_marginBottom="16dp" />
 
         <TextView

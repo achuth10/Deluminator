@@ -72,7 +72,7 @@
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_sort_alphabetically"
                             android:layout_marginEnd="16dp"
-                            android:tint="@color/design_default_color_primary" />
+                            app:tint="@color/design_default_color_primary" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
@@ -147,7 +147,7 @@
                             android:layout_height="24dp"
                             android:src="@android:drawable/ic_menu_day"
                             android:layout_marginEnd="16dp"
-                            android:tint="@color/design_default_color_primary" />
+                            app:tint="@color/design_default_color_primary" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
@@ -225,7 +225,7 @@
                             android:layout_height="24dp"
                             android:src="@drawable/ic_spending_roast"
                             android:layout_marginEnd="16dp"
-                            android:tint="@color/design_default_color_primary" />
+                            app:tint="@color/design_default_color_primary" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -315,7 +315,7 @@
                             android:layout_height="24dp"
                             android:src="@drawable/ic_biometric"
                             android:layout_marginEnd="16dp"
-                            android:tint="@color/design_default_color_primary" />
+                            app:tint="@color/design_default_color_primary" />
 
                         <LinearLayout
                             android:layout_width="0dp"

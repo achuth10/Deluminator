@@ -852,7 +852,7 @@ class MainActivity :
         val dialogBinding = DialogExpensesListBinding.inflate(LayoutInflater.from(this))
         val category = categoryWithExpenses.category
 
-        dialogBinding.tvExpensesTitle.text = "Expenses - ${category.name}"
+        dialogBinding.tvExpensesTitle.text = "${category.name} Expenses"
 
         val expenseAdapter =
                 ExpenseAdapter(

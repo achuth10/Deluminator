@@ -94,7 +94,7 @@
                 android:src="@android:drawable/ic_menu_delete"
                 android:contentDescription="Delete expense"
                 android:padding="6dp"
-                android:tint="@android:color/white"
+                app:tint="@android:color/white"
                 android:alpha="0.8" />
 
         </LinearLayout>

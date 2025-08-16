@@ -90,7 +90,7 @@
                 android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:src="@drawable/ic_trending_up"
-                android:tint="?attr/secondaryTextColor"
+                app:tint="?attr/secondaryTextColor"
                 android:layout_marginBottom="16dp"
                 android:alpha="0.5" />
 

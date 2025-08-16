@@ -76,7 +76,7 @@
                 android:src="@android:drawable/ic_menu_delete"
                 android:contentDescription="Delete expense"
                 android:padding="6dp"
-                android:tint="?attr/secondaryTextColor" />
+                app:tint="?attr/secondaryTextColor" />
 
         </LinearLayout>
 

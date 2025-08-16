@@ -16,8 +16,8 @@ class CategoriesViewModel(application: Application) : AndroidViewModel(applicati
 
         val allCategories: LiveData<List<BudgetCategory>>
 
-        private val _operationResult = MutableLiveData<OperationResult>()
-        val operationResult: LiveData<OperationResult> = _operationResult
+        private val _operationResult = MutableLiveData<OperationResult?>()
+        val operationResult: LiveData<OperationResult?> = _operationResult
 
         init {
                 val database = BudgetDatabase.getDatabase(application)
