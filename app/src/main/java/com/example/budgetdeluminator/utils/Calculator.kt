@@ -125,6 +125,8 @@ class Calculator {
         if (state.currentOperation != Operation.NONE && !state.waitingForOperand) {
             val result = performCalculation()
             if (result.hasError) return result
+            // After calculation, the storedValue is already set to the result
+            // Don't overwrite it with currentValue
         }
 
         val operatorSymbol =
@@ -143,9 +145,13 @@ class Calculator {
                     state.expression + operatorSymbol
                 }
 
+        // Use the stored value from calculation if we just performed one,
+        // otherwise use the current value
+        val valueToStore = if (state.justCalculated) state.storedValue else currentValue
+
         state =
                 state.copy(
-                        storedValue = currentValue,
+                        storedValue = valueToStore,
                         currentOperation = operation,
                         expression = newExpression,
                         waitingForOperand = true,
@@ -215,6 +221,43 @@ class Calculator {
 
     /** Get current value as Double for external use */
     fun getCurrentValue(): Double {
+        // If there's a pending operation and we're not waiting for operand,
+        // we need to perform the calculation first to get the final result
+        if (state.currentOperation != Operation.NONE && !state.waitingForOperand) {
+            val currentValue = parseDisplay()
+            if (currentValue != null) {
+                try {
+                    val result =
+                            when (state.currentOperation) {
+                                Operation.ADD -> state.storedValue.add(currentValue)
+                                Operation.SUBTRACT -> state.storedValue.subtract(currentValue)
+                                Operation.MULTIPLY -> state.storedValue.multiply(currentValue)
+                                Operation.DIVIDE -> {
+                                    if (currentValue == ZERO) {
+                                        return 0.0 // Return 0 for division by zero in
+                                        // getCurrentValue
+                                    }
+                                    state.storedValue.divide(
+                                            currentValue,
+                                            DECIMAL_PLACES,
+                                            RoundingMode.HALF_UP
+                                    )
+                                }
+                                Operation.NONE -> currentValue
+                            }
+                    return result.toDouble()
+                } catch (e: Exception) {
+                    return 0.0
+                }
+            }
+        }
+
+        // If just calculated, return the stored value (which is the result)
+        if (state.justCalculated) {
+            return state.storedValue.toDouble()
+        }
+
+        // Otherwise return the current display value
         return parseDisplay()?.toDouble() ?: 0.0
     }
 

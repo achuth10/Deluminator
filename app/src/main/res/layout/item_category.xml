@@ -12,90 +12,98 @@
         android:orientation="vertical"
         android:padding="@dimen/card_padding">
 
-        <!-- Category Name and Budget Info - Horizontal Layout -->
+        <!-- Category Name at the top -->
+        <TextView
+            android:id="@+id/tvCategoryName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Food &amp; Dining"
+            android:textAppearance="?attr/textAppearanceHeadline6"
+            android:textStyle="bold"
+            android:textColor="?attr/primaryTextColor"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:gravity="start"
+            android:layout_marginBottom="@dimen/spacing_small"
+            android:paddingHorizontal="4dp" />
+
+        <!-- Budget Summary - Left/Right Layout with Dividers like main overview -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:orientation="vertical"
             android:layout_marginBottom="@dimen/spacing_small">
-
-            <!-- Category Name -->
-            <TextView
-                android:id="@+id/tvCategoryName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Food &amp; Dining"
-                android:textAppearance="?attr/textAppearanceHeadline6"
-                android:textStyle="bold"
-                android:textColor="?attr/primaryTextColor"
-                android:maxLines="1"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:gravity="start|center_vertical" />
-
-            <!-- Spent and Remaining - Vertical Layout -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end">
 
             <!-- Spent -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end"
-                android:layout_marginBottom="@dimen/spacing_tiny">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="4dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Spent"
-                    android:textAppearance="?attr/textAppearanceCaption"
+                    android:textSize="14sp"
                     android:textColor="?attr/secondaryTextColor"
-                    android:layout_marginBottom="@dimen/spacing_micro" />
+                    android:gravity="start" />
 
                 <TextView
                     android:id="@+id/tvSpentAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="₹320"
-                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/primaryTextColor" />
+                    android:textColor="?attr/primaryTextColor"
+                    android:maxLines="1"
+                    android:gravity="end" />
 
             </LinearLayout>
 
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorSurfaceVariant"
+                android:layout_marginHorizontal="4dp"
+                android:alpha="0.3" />
+
             <!-- Remaining -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="4dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:text="Left"
-                    android:textAppearance="?attr/textAppearanceCaption"
+                    android:textSize="14sp"
                     android:textColor="?attr/secondaryTextColor"
-                    android:layout_marginBottom="@dimen/spacing_micro" />
+                    android:gravity="start" />
 
                 <TextView
                     android:id="@+id/tvRemainingAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="₹180"
-                    android:textAppearance="?attr/textAppearanceBody2"
+                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/primaryTextColor" />
+                    android:textColor="?attr/primaryTextColor"
+                    android:maxLines="1"
+                    android:gravity="end" />
 
             </LinearLayout>
-
-        </LinearLayout>
 
         </LinearLayout>
 

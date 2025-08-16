@@ -289,12 +289,7 @@ class MainActivity :
                 return@setOnClickListener
             }
 
-            // Perform any pending calculation before getting the final value
-            if (state.currentOperation != Calculator.Operation.NONE && !state.waitingForOperand) {
-                calculator.calculate()
-            }
-
-            // Get the final calculated value
+            // Get the final calculated value (handles pending calculations internally)
             val finalValue = calculator.getCurrentValue()
 
             if (finalValue > 0) {
@@ -431,11 +426,7 @@ class MainActivity :
                 return@setOnClickListener
             }
 
-            // Perform any pending calculation before getting the final value
-            if (state.currentOperation != Calculator.Operation.NONE && !state.waitingForOperand) {
-                calculator.calculate()
-            }
-
+            // Get the final calculated value (handles pending calculations internally)
             val finalValue = calculator.getCurrentValue()
             if (finalValue > 0) {
                 dialog.dismiss()

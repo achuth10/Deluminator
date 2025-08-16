@@ -97,9 +97,9 @@ class HomeFragment : Fragment() {
         val remaining = homeViewModel.getRemainingBudget()
 
         binding.apply {
-            tvTotalBudget.text = currencyPreferences.formatAmount(totalBudget)
-            tvTotalSpent.text = currencyPreferences.formatAmount(totalSpent)
-            tvRemaining.text = currencyPreferences.formatAmount(remaining)
+            tvTotalBudget.text = currencyPreferences.formatAmountWithoutDecimals(totalBudget)
+            tvTotalSpent.text = currencyPreferences.formatAmountWithoutDecimals(totalSpent)
+            tvRemaining.text = currencyPreferences.formatAmountWithoutDecimals(remaining)
 
             // Update progress bar with three-color system
             val percentage =

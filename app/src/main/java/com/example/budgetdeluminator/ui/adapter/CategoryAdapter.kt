@@ -41,10 +41,10 @@ class CategoryAdapter(
 
             binding.apply {
                 tvCategoryName.text = category.name
-                tvSpentAmount.text = currencyPreferences.formatAmount(totalSpent)
+                tvSpentAmount.text = currencyPreferences.formatAmountWithoutDecimals(totalSpent)
 
                 // Set remaining amount with proper color using three-color system
-                tvRemainingAmount.text = currencyPreferences.formatAmount(remaining)
+                tvRemainingAmount.text = currencyPreferences.formatAmountWithoutDecimals(remaining)
                 tvRemainingAmount.setTextColor(
                         when {
                             isOverBudget -> Color.parseColor("#F44336") // Red for over budget
