@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.data.entity.Expense
@@ -33,6 +36,7 @@ import com.example.budgetdeluminator.ui.home.HomeFragment
 import com.example.budgetdeluminator.ui.home.HomeViewModel
 import com.example.budgetdeluminator.ui.recurring.RecurringExpensesFragment
 import com.example.budgetdeluminator.ui.recurring.RecurringExpensesViewModel
+import com.example.budgetdeluminator.utils.BiometricAuthHelper
 import com.example.budgetdeluminator.utils.Calculator
 import com.example.budgetdeluminator.utils.Constants
 import com.example.budgetdeluminator.utils.CurrencyPreferences
@@ -94,6 +98,23 @@ class MainActivity :
 
     private var hasShownBackgroundPermissionDialog = false
 
+    private val settingsLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.let { data ->
+                        if (data.getBooleanExtra(
+                                        com.example.budgetdeluminator.ui.settings.SettingsActivity
+                                                .RESULT_CURRENCY_CHANGED,
+                                        false
+                                )
+                        ) {
+                            // Currency changed, refresh all fragments
+                            refreshAllFragments()
+                        }
+                    }
+                }
+            }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Apply theme before calling super.onCreate()
         val themePreferences = ThemePreferences(this)
@@ -104,6 +125,9 @@ class MainActivity :
         setContentView(binding.root)
 
         currencyPreferences = CurrencyPreferences(this)
+
+        // Check biometric authentication if enabled
+        checkBiometricAuthentication()
 
         setupFragments()
         setupBottomNavigation()
@@ -182,7 +206,7 @@ class MainActivity :
             }
         }
         binding.fabAddExpense.setOnLongClickListener {
-            startActivity(
+            settingsLauncher.launch(
                     Intent(
                             this,
                             com.example.budgetdeluminator.ui.settings.SettingsActivity::class.java
@@ -998,17 +1022,19 @@ class MainActivity :
                                     color = selectedColor
                             )
 
-            lifecycleScope.launchWhenStarted {
-                try {
-                    if (categoryToEdit != null) {
-                        categoriesViewModel.updateCategory(category)
-                    } else {
-                        categoriesViewModel.insertCategory(category)
+            lifecycleScope.launch {
+                repeatOnLifecycle(Lifecycle.State.STARTED) {
+                    try {
+                        if (categoryToEdit != null) {
+                            categoriesViewModel.updateCategory(category)
+                        } else {
+                            categoriesViewModel.insertCategory(category)
+                        }
+                        dialog.dismiss()
+                    } catch (e: Exception) {
+                        Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                                .show()
                     }
-                    dialog.dismiss()
-                } catch (e: Exception) {
-                    Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                            .show()
                 }
             }
         }
@@ -1440,6 +1466,109 @@ class MainActivity :
                     }
                 } catch (e: Exception) {
                     // Silently handle errors - don't bother user with technical issues
+                }
+            }
+        }
+    }
+
+    private fun checkBiometricAuthentication() {
+        // Check if biometric authentication is enabled
+        if (!BiometricAuthHelper.isBiometricEnabled(this)) {
+            return
+        }
+
+        // Check if biometric authentication is available
+        if (!BiometricAuthHelper.isBiometricAvailable(this)) {
+            // Biometric was enabled but is no longer available
+            // Disable it automatically and show a message
+            BiometricAuthHelper.setBiometricEnabled(this, false)
+            Toast.makeText(
+                            this,
+                            "Biometric authentication was disabled because it's no longer available on this device",
+                            Toast.LENGTH_LONG
+                    )
+                    .show()
+            return
+        }
+
+        // Show biometric authentication prompt
+        BiometricAuthHelper.authenticate(
+                this,
+                onSuccess = {
+                    // Authentication successful, continue with app
+                },
+                onError = { error ->
+                    // Authentication failed, show error and close app
+                    AlertDialog.Builder(this)
+                            .setTitle("Authentication Failed")
+                            .setMessage(
+                                    "Biometric authentication failed: $error\n\nThe app will now close for security."
+                            )
+                            .setPositiveButton("OK") { _, _ -> finish() }
+                            .setCancelable(false)
+                            .show()
+                },
+                onCancel = {
+                    // User cancelled authentication, close app
+                    AlertDialog.Builder(this)
+                            .setTitle("Authentication Required")
+                            .setMessage("Biometric authentication is required to access this app.")
+                            .setPositiveButton("Retry") { _, _ -> checkBiometricAuthentication() }
+                            .setNegativeButton("Exit") { _, _ -> finish() }
+                            .setCancelable(false)
+                            .show()
+                }
+        )
+    }
+
+    private fun refreshAllFragments() {
+        // Refresh currency preferences instance
+        currencyPreferences = CurrencyPreferences(this)
+
+        // Get current fragment and refresh it
+        val currentFragment = supportFragmentManager.findFragmentById(binding.fragmentContainer.id)
+        currentFragment?.let { fragment ->
+            when (fragment) {
+                is HomeFragment -> {
+                    // Home fragment will automatically refresh when ViewModel observes data changes
+                    // Force refresh the currency display by recreating the fragment
+                    supportFragmentManager
+                            .beginTransaction()
+                            .detach(fragment)
+                            .attach(fragment)
+                            .commit()
+                }
+                is AllExpensesFragment -> {
+                    // Refresh expenses fragment
+                    supportFragmentManager
+                            .beginTransaction()
+                            .detach(fragment)
+                            .attach(fragment)
+                            .commit()
+                }
+                is CategoriesFragment -> {
+                    // Refresh categories fragment
+                    supportFragmentManager
+                            .beginTransaction()
+                            .detach(fragment)
+                            .attach(fragment)
+                            .commit()
+                }
+                is RecurringExpensesFragment -> {
+                    // Refresh recurring expenses fragment
+                    supportFragmentManager
+                            .beginTransaction()
+                            .detach(fragment)
+                            .attach(fragment)
+                            .commit()
+                }
+                else -> {
+                    // Handle any other fragment types - just refresh by detaching and reattaching
+                    supportFragmentManager
+                            .beginTransaction()
+                            .detach(fragment)
+                            .attach(fragment)
+                            .commit()
                 }
             }
         }

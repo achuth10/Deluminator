@@ -48,6 +48,11 @@ class CategoriesFragment : Fragment() {
                 _binding = null
         }
 
+        fun refreshCurrency() {
+                // Refresh the adapter to update currency formatting in category budget limits
+                categoryAdapter.notifyDataSetChanged()
+        }
+
         private fun setupRecyclerView() {
                 categoryAdapter =
                         CategoryManagementAdapter(

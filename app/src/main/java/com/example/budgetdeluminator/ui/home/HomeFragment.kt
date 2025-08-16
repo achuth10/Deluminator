@@ -12,6 +12,8 @@ import com.example.budgetdeluminator.databinding.FragmentHomeBinding
 import com.example.budgetdeluminator.ui.adapter.CategoryAdapter
 import com.example.budgetdeluminator.utils.CurrencyPreferences
 import com.example.budgetdeluminator.utils.DateUtils
+import com.example.budgetdeluminator.utils.MoneyJokes
+import com.example.budgetdeluminator.utils.SpendingRoastPreferences
 import java.util.*
 
 class HomeFragment : Fragment() {
@@ -40,6 +42,7 @@ class HomeFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
         setupClickListeners()
+        setupSpendingRoast()
     }
 
     private fun setupRecyclerView() {
@@ -182,6 +185,57 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    fun refreshCurrency() {
+        // Update currency preferences instance
+        currencyPreferences = CurrencyPreferences(requireContext())
+
+        // Refresh the UI with new currency
+        updateOverviewData()
+        updateCurrentMonthDisplay()
+
+        // Refresh the category adapter if it uses currency formatting
+        categoryAdapter.notifyDataSetChanged()
+    }
+
+    private fun setupSpendingRoast() {
+        // Check if spending roasts are enabled
+        if (!SpendingRoastPreferences.isSpendingRoastEnabled(requireContext())) {
+            binding.cardSpendingRoast.visibility = View.GONE
+            return
+        }
+
+        // Get and display an expense-specific roast based on spending patterns
+        val categoriesWithExpenses = homeViewModel.categoriesWithExpenses.value ?: emptyList()
+        val totalBudget = homeViewModel.getTotalBudget()
+        val totalSpent = homeViewModel.getTotalSpent()
+
+        val roast =
+                if (categoriesWithExpenses.isNotEmpty()) {
+                    MoneyJokes.getExpenseSpecificRoast(
+                            requireContext(),
+                            categoriesWithExpenses,
+                            totalBudget,
+                            totalSpent
+                    )
+                } else {
+                    MoneyJokes.getRandomJoke(requireContext())
+                }
+        binding.tvSpendingRoast.text = roast
+
+        // Set up dismiss functionality
+        binding.ivDismissRoast.setOnClickListener {
+            // Hide the card immediately
+            binding.cardSpendingRoast.visibility = View.GONE
+
+            // Disable the setting so it doesn't show again
+            SpendingRoastPreferences.setSpendingRoastEnabled(requireContext(), false)
+        }
+
+        // Add a subtle animation when the roast appears
+        binding.cardSpendingRoast.alpha = 0f
+        binding.cardSpendingRoast.animate().alpha(1f).setDuration(300).start()
     }
 
     interface OnCategoryClickListener {

@@ -59,17 +59,13 @@
                         android:textColor="?attr/primaryTextColor"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Current Currency Display -->
+                    <!-- Currency Dropdown -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="12dp"
-                        android:id="@+id/layoutCurrencySelector">
+                        android:padding="12dp">
 
                         <ImageView
                             android:layout_width="24dp"
@@ -78,37 +74,35 @@
                             android:layout_marginEnd="16dp"
                             android:tint="@color/design_default_color_primary" />
 
-                        <LinearLayout
+                        <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:orientation="vertical">
+                            android:hint="Selected Currency"
+                            app:boxStrokeColor="@color/design_default_color_primary"
+                            app:hintTextColor="@color/design_default_color_primary"
+                            app:endIconMode="dropdown_menu">
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <AutoCompleteTextView
+                                android:id="@+id/actvCurrency"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Selected Currency"
-                                android:textSize="14sp"
-                                android:textColor="?attr/secondaryTextColor" />
+                                android:inputType="text"
+                                android:completionThreshold="1"
+                                android:text="Indian Rupee (₹)" />
 
-                            <TextView
-                                android:id="@+id/tvSelectedCurrency"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Indian Rupee (₹)"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:textColor="?attr/primaryTextColor"
-                                android:maxLines="1"
-                                android:ellipsize="end" />
-
-                        </LinearLayout>
+                        </com.google.android.material.textfield.TextInputLayout>
 
                         <ImageView
+                            android:id="@+id/ivCurrencyInfo"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@android:drawable/arrow_down_float"
-                            android:tint="?attr/secondaryTextColor" />
+                            android:src="@android:drawable/ic_dialog_info"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:alpha="0.7"
+                            android:contentDescription="Currency info" />
 
                     </LinearLayout>
 
@@ -140,7 +134,81 @@
                         android:textColor="?attr/primaryTextColor"
                         android:layout_marginBottom="16dp" />
 
-                    <!-- Current Theme Display -->
+                    <!-- Theme Dropdown -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="12dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_menu_day"
+                            android:layout_marginEnd="16dp"
+                            android:tint="@color/design_default_color_primary" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:hint="Selected Theme"
+                            app:boxStrokeColor="@color/design_default_color_primary"
+                            app:hintTextColor="@color/design_default_color_primary"
+                            app:endIconMode="dropdown_menu">
+
+                            <AutoCompleteTextView
+                                android:id="@+id/actvTheme"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none"
+                                android:text="System Default" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <ImageView
+                            android:id="@+id/ivThemeInfo"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_dialog_info"
+                            android:layout_marginStart="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:alpha="0.7"
+                            android:contentDescription="Theme info" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Spending Roast Settings Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="?attr/cardBackgroundColor">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Spending Roasts"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/primaryTextColor"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Spending Roast Toggle -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -150,12 +218,12 @@
                         android:clickable="true"
                         android:focusable="true"
                         android:padding="12dp"
-                        android:id="@+id/layoutThemeSelector">
+                        android:id="@+id/layoutSpendingRoastToggle">
 
                         <ImageView
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@android:drawable/ic_menu_day"
+                            android:src="@drawable/ic_spending_roast"
                             android:layout_marginEnd="16dp"
                             android:tint="@color/design_default_color_primary" />
 
@@ -168,28 +236,37 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Selected Theme"
-                                android:textSize="14sp"
-                                android:textColor="?attr/secondaryTextColor" />
-
-                            <TextView
-                                android:id="@+id/tvSelectedTheme"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="System Default"
+                                android:text="Show Spending Roasts"
                                 android:textSize="16sp"
                                 android:textStyle="bold"
-                                android:textColor="?attr/primaryTextColor"
-                                android:maxLines="1"
-                                android:ellipsize="end" />
+                                android:textColor="?attr/primaryTextColor" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Display witty comments about your spending"
+                                android:textSize="14sp"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:layout_marginTop="2dp" />
 
                         </LinearLayout>
 
                         <ImageView
+                            android:id="@+id/ivSpendingRoastInfo"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
-                            android:src="@android:drawable/arrow_down_float"
-                            android:tint="?attr/secondaryTextColor" />
+                            android:src="@android:drawable/ic_dialog_info"
+                            android:layout_marginEnd="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:alpha="0.7"
+                            android:contentDescription="Spending roast info" />
+
+                        <Switch
+                            android:id="@+id/switchSpendingRoast"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
 
                     </LinearLayout>
 
@@ -197,12 +274,14 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- About Currency Section -->
+            <!-- Biometric Authentication Settings Card -->
             <com.google.android.material.card.MaterialCardView
-                style="@style/NeumorphicCardStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp">
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="?attr/cardBackgroundColor">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -213,19 +292,73 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="About Settings"
-                        android:textSize="16sp"
+                        android:text="Security"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="?attr/primaryTextColor"
-                        android:layout_marginBottom="8dp" />
+                        android:layout_marginBottom="16dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Biometric Authentication Toggle -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Customize your app experience with currency and theme preferences. The selected currency will be used throughout the app for displaying amounts, budgets, and expenses. Choose from Light, Dark, or System Default theme to match your preference."
-                        android:textSize="14sp"
-                        android:textColor="?attr/secondaryTextColor"
-                        android:lineSpacingExtra="2dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="12dp"
+                        android:id="@+id/layoutBiometricToggle">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_biometric"
+                            android:layout_marginEnd="16dp"
+                            android:tint="@color/design_default_color_primary" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Biometric Authentication"
+                                android:textSize="16sp"
+                                android:textStyle="bold"
+                                android:textColor="?attr/primaryTextColor" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Require fingerprint or face unlock to access app"
+                                android:textSize="14sp"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:layout_marginTop="2dp" />
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/ivBiometricInfo"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@android:drawable/ic_dialog_info"
+                            android:layout_marginEnd="8dp"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="4dp"
+                            android:alpha="0.7"
+                            android:contentDescription="Biometric authentication info" />
+
+                        <Switch
+                            android:id="@+id/switchBiometric"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 

@@ -8,17 +8,17 @@
     
     <item
         android:id="@+id/nav_all_expenses"
-        android:icon="@android:drawable/ic_menu_recent_history"
+        android:icon="@drawable/ic_expenses"
         android:title="Expenses" />
     
     <item
         android:id="@+id/nav_categories"
-        android:icon="@android:drawable/ic_menu_sort_alphabetically"
+        android:icon="@drawable/ic_categories"
         android:title="Categories" />
     
     <item
         android:id="@+id/nav_recurring_expenses"
-        android:icon="@android:drawable/ic_menu_recent_history"
+        android:icon="@drawable/ic_recurring"
         android:title="Recurring" />
     
 </menu>

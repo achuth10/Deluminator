@@ -172,6 +172,11 @@ class RecurringExpensesFragment : Fragment() {
         }
     }
 
+    fun refreshCurrency() {
+        // Refresh the adapter to update currency formatting
+        recurringExpenseAdapter.refreshCurrency()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

@@ -219,6 +219,20 @@ class AllExpensesFragment : Fragment() {
         _binding = null
     }
 
+    fun refreshCurrency() {
+        // Update currency preferences instance
+        currencyPreferences = CurrencyPreferences(requireContext())
+
+        // Refresh the filtered total with new currency
+        expensesViewModel.allExpensesWithCategory.value?.let { allExpensesWithCategory ->
+            val filteredExpenses = filterExpensesByDateRange(allExpensesWithCategory)
+            updateFilteredTotal(filteredExpenses)
+        }
+
+        // Refresh the adapter to update currency formatting in expense items
+        expenseAdapter.notifyDataSetChanged()
+    }
+
     interface OnExpenseClickListener {
         fun onExpenseClicked(expense: Expense)
     }
