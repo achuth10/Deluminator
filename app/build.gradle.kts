@@ -4,22 +4,70 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+import java.util.Properties
+
+// Load keystore properties
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
+}
+
 android {
     namespace = "com.example.budgetdeluminator"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.budgetdeluminator"
+        applicationId = "com.budgetdeluminator.app"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        // Room schema export directory
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += mapOf(
+                    "room.schemaLocation" to "$projectDir/schemas",
+                    "room.incremental" to "true"
+                )
+            }
+        }
+    }
+
+    signingConfigs {
+        create("release") {
+            if (keystoreProperties.containsKey("keyAlias")) {
+                keyAlias = keystoreProperties.getProperty("keyAlias")
+                keyPassword = keystoreProperties.getProperty("keyPassword")
+                storeFile = file(keystoreProperties.getProperty("storeFile"))
+                storePassword = keystoreProperties.getProperty("storePassword")
+            } else {
+                // Fallback for CI/CD or when keystore.properties doesn't exist
+                keyAlias = System.getenv("KEY_ALIAS") ?: "budget_deluminator_key"
+                keyPassword = System.getenv("KEY_PASSWORD") ?: "change_this_password"
+                storeFile = file(System.getenv("STORE_FILE") ?: "release-keystore.jks")
+                storePassword = System.getenv("STORE_PASSWORD") ?: "change_this_password"
+            }
+        }
     }
 
     buildTypes {
         release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = signingConfigs.getByName("release")
+            isDebuggable = false
+            isJniDebuggable = false
+            isPseudoLocalesEnabled = false
+        }
+        debug {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
