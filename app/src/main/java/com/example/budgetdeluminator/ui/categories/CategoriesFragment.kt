@@ -112,6 +112,10 @@ class CategoriesFragment : Fragment() {
                 val dialogBinding =
                         DialogAddCategoryBinding.inflate(LayoutInflater.from(requireContext()))
 
+                // Set dialog title based on whether we're adding or editing
+                dialogBinding.tvDialogTitle.text =
+                        if (categoryToEdit == null) "Add Category" else "Edit Category"
+
                 // Available color options
                 val colorOptions =
                         arrayOf(
@@ -162,6 +166,7 @@ class CategoriesFragment : Fragment() {
 
                 val dialog =
                         AlertDialog.Builder(requireContext()).setView(dialogBinding.root).create()
+                dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
                 dialogBinding.btnCancel.setOnClickListener { dialog.dismiss() }
 

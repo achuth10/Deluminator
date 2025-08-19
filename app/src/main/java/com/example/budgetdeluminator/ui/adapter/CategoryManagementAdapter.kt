@@ -54,7 +54,8 @@ class CategoryManagementAdapter(
                     root.setCardBackgroundColor(Color.parseColor("#4CAF50"))
                 }
 
-                btnEditCategory.setOnClickListener { onEditClick(category) }
+                // Set click listener on the entire card for editing
+                root.setOnClickListener { onEditClick(category) }
                 btnDeleteCategory.setOnClickListener { onDeleteClick(category) }
             }
         }

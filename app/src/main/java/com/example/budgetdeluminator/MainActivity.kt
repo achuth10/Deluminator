@@ -247,6 +247,7 @@ class MainActivity :
         val calculator = Calculator()
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         fun updateDisplay() {
             val state = calculator.getState()
@@ -384,6 +385,7 @@ class MainActivity :
         }
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         fun updateDisplay() {
             val state = calculator.getState()
@@ -521,6 +523,7 @@ class MainActivity :
         updateDateDisplay(dialogBinding, selectedDate)
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         // Close button
         dialogBinding.btnCloseExpenseForm.setOnClickListener { dialog.dismiss() }
@@ -687,6 +690,7 @@ class MainActivity :
         val dialogBinding = DialogCategorySelectionBinding.inflate(LayoutInflater.from(this))
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         val categorySelectionAdapter = CategorySelectionAdapter { category ->
             onCategorySelected(category)
@@ -703,12 +707,11 @@ class MainActivity :
         }
 
         dialogBinding.btnAddCategoryFromSelection.setOnClickListener {
-            dialog.dismiss()
-            // Navigate to categories fragment
-            replaceFragment(categoriesFragment)
-            supportActionBar?.title = "Categories"
-            binding.bottomNavigation.selectedItemId = R.id.nav_categories
-            binding.fabAddExpense.hide()
+            // Open add category modal, and when saved, auto-select the new category
+            showAddCategoryDialogFromSelection { newCategory ->
+                onCategorySelected(newCategory)
+                dialog.dismiss()
+            }
         }
 
         dialog.show()
@@ -725,6 +728,7 @@ class MainActivity :
         updateDateDisplay(dialogBinding, selectedDate)
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         // Update the layout's title instead of AlertDialog title
         dialogBinding.tvExpenseFormTitle.text = "Edit Expense"
@@ -877,6 +881,7 @@ class MainActivity :
         }
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         // Calculate date range for the selected month
         val monthStart =
@@ -957,8 +962,19 @@ class MainActivity :
     }
 
     // Category Dialog Methods
-    private fun showAddCategoryDialog(categoryToEdit: BudgetCategory? = null) {
+    private fun showAddCategoryDialogFromSelection(onCategoryCreated: (BudgetCategory) -> Unit) {
+        showAddCategoryDialog(null, onCategoryCreated)
+    }
+
+    private fun showAddCategoryDialog(
+            categoryToEdit: BudgetCategory? = null,
+            onCategoryCreated: ((BudgetCategory) -> Unit)? = null
+    ) {
         val dialogBinding = DialogAddCategoryBinding.inflate(LayoutInflater.from(this))
+
+        // Set dialog title based on whether we're adding or editing
+        dialogBinding.tvDialogTitle.text =
+                if (categoryToEdit == null) "Add Category" else "Edit Category"
 
         // Available color options
         val colorOptions =
@@ -1017,6 +1033,7 @@ class MainActivity :
         }
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         dialogBinding.btnSave.setOnClickListener {
             val name = dialogBinding.etCategoryName.text.toString().trim()
@@ -1052,6 +1069,8 @@ class MainActivity :
                             categoriesViewModel.updateCategory(category)
                         } else {
                             categoriesViewModel.insertCategory(category)
+                            // If this is a new category and we have a callback, call it
+                            onCategoryCreated?.invoke(category)
                         }
                         dialog.dismiss()
                     } catch (e: Exception) {
@@ -1084,6 +1103,7 @@ class MainActivity :
         var currentAmount: Double = 0.0
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
 
         // Set title based on edit/add mode
         dialogBinding.tvRecurringExpenseFormTitle.text =

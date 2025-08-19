@@ -7,14 +7,20 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.budgetdeluminator.data.entity.BudgetCategory
-import com.example.budgetdeluminator.databinding.ItemCategorySelectionBinding
+import com.example.budgetdeluminator.databinding.ItemCategorySelectionCardBinding
 
-class CategorySelectionAdapter(
-    private val onCategorySelected: (BudgetCategory) -> Unit
-) : ListAdapter<BudgetCategory, CategorySelectionAdapter.CategoryViewHolder>(CategoryDiffCallback()) {
+class CategorySelectionAdapter(private val onCategorySelected: (BudgetCategory) -> Unit) :
+        ListAdapter<BudgetCategory, CategorySelectionAdapter.CategoryViewHolder>(
+                CategoryDiffCallback()
+        ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
-        val binding = ItemCategorySelectionBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+                ItemCategorySelectionCardBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                )
         return CategoryViewHolder(binding)
     }
 
@@ -22,23 +28,22 @@ class CategorySelectionAdapter(
         holder.bind(getItem(position))
     }
 
-    inner class CategoryViewHolder(private val binding: ItemCategorySelectionBinding) : RecyclerView.ViewHolder(binding.root) {
-        
+    inner class CategoryViewHolder(private val binding: ItemCategorySelectionCardBinding) :
+            RecyclerView.ViewHolder(binding.root) {
+
         fun bind(category: BudgetCategory) {
             binding.apply {
-                tvCategorySelectionName.text = category.name
-                
-                // Set category color
+                tvCategoryName.text = category.name
+
+                // Set card background color based on category color
                 try {
                     val color = Color.parseColor(category.color)
-                    viewCategoryColorIndicator.backgroundTintList = android.content.res.ColorStateList.valueOf(color)
+                    root.setCardBackgroundColor(color)
                 } catch (e: IllegalArgumentException) {
-                    viewCategoryColorIndicator.backgroundTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#4CAF50"))
+                    // Default to green if color parsing fails
+                    root.setCardBackgroundColor(Color.parseColor("#4CAF50"))
                 }
-                
-                // Hide favorite star for now
-                ivCategoryFavorite.visibility = android.view.View.GONE
-                
+
                 root.setOnClickListener { onCategorySelected(category) }
             }
         }
