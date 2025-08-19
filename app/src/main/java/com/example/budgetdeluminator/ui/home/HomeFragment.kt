@@ -83,6 +83,7 @@ class HomeFragment : Fragment() {
 
     private fun setupClickListeners() {
         binding.chipCurrentMonth.setOnClickListener { showMonthSelector() }
+        binding.ivTotalSpentInfo.setOnClickListener { showTotalSpentInfoDialog() }
     }
 
     private fun initializeLoadingState() {
@@ -133,6 +134,7 @@ class HomeFragment : Fragment() {
     private fun updateOverviewData() {
         val totalBudget = homeViewModel.getTotalBudget()
         val totalSpent = homeViewModel.getTotalSpent()
+        val totalSpentBudgeted = homeViewModel.getTotalSpentBudgeted()
         val remaining = homeViewModel.getRemainingBudget()
 
         binding.apply {
@@ -140,10 +142,10 @@ class HomeFragment : Fragment() {
             tvTotalSpent.text = currencyPreferences.formatAmountWithoutDecimals(totalSpent)
             tvRemaining.text = currencyPreferences.formatAmountWithoutDecimals(remaining)
 
-            // Update progress bar with three-color system
+            // Update progress bar with three-color system (based on budgeted spending only)
             val percentage =
                     if (totalBudget > 0) {
-                        ((totalSpent / totalBudget) * 100).toInt()
+                        ((totalSpentBudgeted / totalBudget) * 100).toInt()
                     } else 0
             progressBarOverall.progress = percentage.coerceAtMost(100)
 
@@ -272,6 +274,32 @@ class HomeFragment : Fragment() {
         // Add a subtle animation when the roast appears
         binding.cardSpendingRoast.alpha = 0f
         binding.cardSpendingRoast.animate().alpha(1f).setDuration(300).start()
+    }
+
+    private fun showTotalSpentInfoDialog() {
+        val totalSpent = homeViewModel.getTotalSpent()
+        val totalSpentBudgeted = homeViewModel.getTotalSpentBudgeted()
+        val totalSpentTracking = homeViewModel.getTotalSpentTracking()
+
+        val message = buildString {
+            append("Total Spent includes all your expenses:\n\n")
+            append(
+                    "• Budgeted categories: ${CurrencyPreferences(requireContext()).formatAmountWithoutDecimals(totalSpentBudgeted)}\n"
+            )
+            append(
+                    "• Tracking-only categories: ${CurrencyPreferences(requireContext()).formatAmountWithoutDecimals(totalSpentTracking)}\n\n"
+            )
+            append(
+                    "• Total Spent: ${CurrencyPreferences(requireContext()).formatAmountWithoutDecimals(totalSpent)}\n\n"
+            )
+            append("This gives you a complete picture of your spending across all categories.")
+        }
+
+        android.app.AlertDialog.Builder(requireContext())
+                .setTitle("Total Spent Calculation")
+                .setMessage(message)
+                .setPositiveButton("Got it", null)
+                .show()
     }
 
     interface OnCategoryClickListener {

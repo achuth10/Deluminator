@@ -43,7 +43,11 @@ class CategoryManagementAdapter(
             binding.apply {
                 tvCategoryName.text = category.name
                 tvBudgetLimit.text =
-                        "Budget: ${currencyPreferences.formatAmount(category.budgetLimit)}"
+                        if (category.budgetLimit != null) {
+                            "Budget: ${currencyPreferences.formatAmount(category.budgetLimit)}"
+                        } else {
+                            "Tracking Only"
+                        }
 
                 // Set card background color based on category color
                 try {

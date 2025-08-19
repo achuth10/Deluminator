@@ -150,7 +150,7 @@ class BudgetRepository(
         suspend fun getTotalBudget(): Double =
                 withContext(Dispatchers.IO) {
                         val categories = budgetCategoryDao.getAllCategories().value ?: emptyList()
-                        categories.sumOf { it.budgetLimit }
+                        categories.sumOf { it.budgetLimit ?: 0.0 }
                 }
 
         suspend fun getTotalSpent(): Double =

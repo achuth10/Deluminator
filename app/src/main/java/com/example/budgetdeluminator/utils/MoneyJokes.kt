@@ -255,10 +255,13 @@ object MoneyJokes {
             val category = categoryWithExpenses.category
             val spent = categoryWithExpenses.totalSpent
 
-            if (spent > category.budgetLimit) {
-                // Generate dynamic category roasts using actual category name
-                val categoryRoasts = generateCategoryRoasts(category.name)
-                categoryRoastCandidates.addAll(categoryRoasts)
+            // Only check budget limits for categories that have them
+            category.budgetLimit?.let { budgetLimit ->
+                if (spent > budgetLimit) {
+                    // Generate dynamic category roasts using actual category name
+                    val categoryRoasts = generateCategoryRoasts(category.name)
+                    categoryRoastCandidates.addAll(categoryRoasts)
+                }
             }
         }
 

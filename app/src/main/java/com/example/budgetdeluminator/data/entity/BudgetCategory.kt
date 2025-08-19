@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 data class BudgetCategory(
         @PrimaryKey(autoGenerate = true) val id: Long = 0,
         val name: String,
-        val budgetLimit: Double,
+        val budgetLimit: Double?, // Nullable - null means tracking-only category
         val color: String = "#4CAF50", // Default green color
         val createdAt: Long = System.currentTimeMillis(),
         val displayOrder: Int = 0 // Order for displaying categories

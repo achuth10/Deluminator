@@ -24,15 +24,7 @@
             android:padding="16dp"
             android:gravity="center_vertical">
 
-        <!-- Expense icon -->
-        <View
-            android:id="@+id/viewExpenseIcon"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_marginEnd="12dp"
-            android:background="@drawable/circle_background"
-            android:backgroundTint="@android:color/white"
-            android:alpha="0.3" />
+
 
         <LinearLayout
             android:layout_width="0dp"

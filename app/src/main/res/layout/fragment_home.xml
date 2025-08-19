@@ -143,7 +143,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Total Budget"
+                            android:text="Total Budgeted"
                             android:textSize="15sp"
                             android:textColor="?attr/secondaryTextColor"
                             android:gravity="start" />
@@ -178,14 +178,36 @@
                         android:paddingVertical="@dimen/spacing_small"
                         android:paddingHorizontal="@dimen/spacing_micro">
 
-                        <TextView
+                        <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
-                            android:text="Total Spent"
-                            android:textSize="15sp"
-                            android:textColor="?attr/secondaryTextColor"
-                            android:gravity="start" />
+                            android:orientation="horizontal"
+                            android:gravity="start|center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total Spent"
+                                android:textSize="15sp"
+                                android:textColor="?attr/secondaryTextColor"
+                                android:gravity="start" />
+
+                            <ImageView
+                                android:id="@+id/ivTotalSpentInfo"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_marginStart="4dp"
+                                android:src="@android:drawable/ic_dialog_info"
+                                android:contentDescription="Total spent information"
+                                android:background="?attr/selectableItemBackgroundBorderless"
+                                android:padding="2dp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                app:tint="?attr/secondaryTextColor"
+                                android:alpha="0.7" />
+
+                        </LinearLayout>
 
                         <TextView
                             android:id="@+id/tvTotalSpent"

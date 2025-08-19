@@ -81,15 +81,28 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getTotalBudget(): Double {
-        return categoriesWithExpenses.value?.sumOf { it.category.budgetLimit } ?: 0.0
+        return categoriesWithExpenses.value?.filter { it.hasBudgetLimit }?.sumOf {
+            it.category.budgetLimit!!
+        }
+                ?: 0.0
     }
 
     fun getTotalSpent(): Double {
         return categoriesWithExpenses.value?.sumOf { it.totalSpent } ?: 0.0
     }
 
+    fun getTotalSpentBudgeted(): Double {
+        return categoriesWithExpenses.value?.filter { it.hasBudgetLimit }?.sumOf { it.totalSpent }
+                ?: 0.0
+    }
+
+    fun getTotalSpentTracking(): Double {
+        return categoriesWithExpenses.value?.filter { it.isTrackingOnly }?.sumOf { it.totalSpent }
+                ?: 0.0
+    }
+
     fun getRemainingBudget(): Double {
-        return getTotalBudget() - getTotalSpent()
+        return getTotalBudget() - getTotalSpentBudgeted()
     }
 
     fun selectMonth(month: Int, year: Int) {

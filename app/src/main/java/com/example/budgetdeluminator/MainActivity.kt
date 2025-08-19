@@ -1028,8 +1028,33 @@ class MainActivity :
         // Pre-fill if editing
         categoryToEdit?.let { category ->
             dialogBinding.etCategoryName.setText(category.name)
-            dialogBinding.etBudgetLimit.setText(category.budgetLimit.toString())
+            // Set switch and budget limit based on existing data
+            val hasBudgetLimit = category.budgetLimit != null
+            dialogBinding.switchBudgetLimit.isChecked = hasBudgetLimit
+            if (hasBudgetLimit) {
+                dialogBinding.etBudgetLimit.setText(category.budgetLimit.toString())
+            }
             selectedColor = category.color
+        }
+
+        // Setup budget limit toggle functionality
+        fun updateBudgetLimitVisibility(hasBudgetLimit: Boolean) {
+            if (hasBudgetLimit) {
+                dialogBinding.tilBudgetLimit.visibility = View.VISIBLE
+                dialogBinding.tvTrackingInfo.visibility = View.GONE
+            } else {
+                dialogBinding.tilBudgetLimit.visibility = View.GONE
+                dialogBinding.tvTrackingInfo.visibility = View.VISIBLE
+                dialogBinding.etBudgetLimit.setText("") // Clear any existing value
+            }
+        }
+
+        // Initialize visibility based on switch state
+        updateBudgetLimitVisibility(dialogBinding.switchBudgetLimit.isChecked)
+
+        // Setup switch change listener
+        dialogBinding.switchBudgetLimit.setOnCheckedChangeListener { _, isChecked ->
+            updateBudgetLimitVisibility(isChecked)
         }
 
         // Setup color picker
@@ -1070,17 +1095,57 @@ class MainActivity :
 
         dialogBinding.btnSave.setOnClickListener {
             val name = dialogBinding.etCategoryName.text.toString().trim()
-            val budgetText = dialogBinding.etBudgetLimit.text.toString().trim()
+            val hasBudgetLimit = dialogBinding.switchBudgetLimit.isChecked
+            val budgetLimitText = dialogBinding.etBudgetLimit.text.toString().trim()
 
+            // Validate name
             if (name.isEmpty()) {
                 Toast.makeText(this, "Please enter a category name", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val budgetLimit = budgetText.toDoubleOrNull()
-            if (budgetLimit == null || budgetLimit <= 0) {
-                Toast.makeText(this, "Please enter a valid budget limit", Toast.LENGTH_SHORT).show()
+            // Validate name length
+            if (name.length > 50) {
+                Toast.makeText(
+                                this,
+                                "Category name must be 50 characters or less",
+                                Toast.LENGTH_SHORT
+                        )
+                        .show()
                 return@setOnClickListener
+            }
+
+            // Validate budget limit if enabled
+            var budgetLimit: Double? = null
+            if (hasBudgetLimit) {
+                if (budgetLimitText.isEmpty()) {
+                    Toast.makeText(
+                                    this,
+                                    "Please enter a budget limit or disable budget tracking",
+                                    Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    return@setOnClickListener
+                }
+
+                val parsedLimit = budgetLimitText.toDoubleOrNull()
+                if (parsedLimit == null || parsedLimit <= 0) {
+                    Toast.makeText(this, "Please enter a valid budget amount", Toast.LENGTH_SHORT)
+                            .show()
+                    return@setOnClickListener
+                }
+
+                if (parsedLimit > 999999.99) {
+                    Toast.makeText(
+                                    this,
+                                    "Budget amount cannot exceed $999,999.99",
+                                    Toast.LENGTH_SHORT
+                            )
+                            .show()
+                    return@setOnClickListener
+                }
+
+                budgetLimit = parsedLimit
             }
 
             val category =

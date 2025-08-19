@@ -15,7 +15,7 @@ import com.example.budgetdeluminator.data.entity.RecurringExpense
 
 @Database(
         entities = [BudgetCategory::class, Expense::class, RecurringExpense::class],
-        version = 5,
+        version = 6,
         exportSchema = true
 )
 abstract class BudgetDatabase : RoomDatabase() {
@@ -26,6 +26,43 @@ abstract class BudgetDatabase : RoomDatabase() {
 
     companion object {
         @Volatile private var INSTANCE: BudgetDatabase? = null
+
+        /** Migration from version 5 to 6 Make budgetLimit nullable for tracking-only categories */
+        private val MIGRATION_5_6 =
+                object : Migration(5, 6) {
+                    override fun migrate(database: SupportSQLiteDatabase) {
+                        // Create a new table with the updated schema
+                        database.execSQL(
+                                """
+                                CREATE TABLE budget_categories_new (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                    name TEXT NOT NULL,
+                                    budgetLimit REAL,
+                                    color TEXT NOT NULL DEFAULT '#4CAF50',
+                                    createdAt INTEGER NOT NULL,
+                                    displayOrder INTEGER NOT NULL DEFAULT 0
+                                )
+                                """.trimIndent()
+                        )
+
+                        // Copy data from old table to new table
+                        database.execSQL(
+                                """
+                                INSERT INTO budget_categories_new (id, name, budgetLimit, color, createdAt, displayOrder)
+                                SELECT id, name, budgetLimit, color, createdAt, displayOrder
+                                FROM budget_categories
+                                """.trimIndent()
+                        )
+
+                        // Drop the old table
+                        database.execSQL("DROP TABLE budget_categories")
+
+                        // Rename the new table to the original name
+                        database.execSQL(
+                                "ALTER TABLE budget_categories_new RENAME TO budget_categories"
+                        )
+                    }
+                }
 
         /**
          * Migration from version 4 to 5 Added source and recurringExpenseId columns to expenses
@@ -90,7 +127,8 @@ abstract class BudgetDatabase : RoomDatabase() {
                                                 MIGRATION_1_2,
                                                 MIGRATION_2_3,
                                                 MIGRATION_3_4,
-                                                MIGRATION_4_5
+                                                MIGRATION_4_5,
+                                                MIGRATION_5_6
                                         )
                                         // Only fallback to destructive migration in debug builds
                                         .apply {

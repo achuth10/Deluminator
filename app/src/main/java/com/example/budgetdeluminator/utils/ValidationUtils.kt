@@ -42,9 +42,10 @@ object ValidationUtils {
         }
     }
 
-    /** Validates budget limit */
-    fun validateBudgetLimit(limit: Double): ValidationResult {
+    /** Validates budget limit (null allowed for tracking-only categories) */
+    fun validateBudgetLimit(limit: Double?): ValidationResult {
         return when {
+            limit == null -> ValidationResult.Success // Null is valid for tracking-only categories
             limit < 0 -> ValidationResult.Error("Budget limit cannot be negative")
             limit > 999999.99 -> ValidationResult.Error("Budget limit cannot exceed $999,999.99")
             limit.toString().split(".").getOrNull(1)?.length ?: 0 > 2 ->
