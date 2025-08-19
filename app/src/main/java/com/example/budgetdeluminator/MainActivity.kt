@@ -126,6 +126,9 @@ class MainActivity :
 
         currencyPreferences = CurrencyPreferences(this)
 
+        // Set secure flag if biometric authentication is enabled
+        BiometricAuthHelper.updateSecureFlag(this)
+
         // Check biometric authentication if enabled
         checkBiometricAuthentication()
 
@@ -852,7 +855,14 @@ class MainActivity :
         val dialogBinding = DialogExpensesListBinding.inflate(LayoutInflater.from(this))
         val category = categoryWithExpenses.category
 
-        dialogBinding.tvExpensesTitle.text = "${category.name} Expenses"
+        // Get the selected month from HomeViewModel to filter expenses
+        val selectedMonth =
+                homeViewModel.selectedMonth.value
+                        ?: com.example.budgetdeluminator.utils.DateUtils.getCurrentMonthYear()
+        val monthName =
+                "${com.example.budgetdeluminator.utils.DateUtils.getMonthName(selectedMonth.first)} ${selectedMonth.second}"
+
+        dialogBinding.tvExpensesTitle.text = "${category.name} Expenses - $monthName"
 
         val expenseAdapter =
                 ExpenseAdapter(
@@ -868,17 +878,30 @@ class MainActivity :
 
         val dialog = AlertDialog.Builder(this).setView(dialogBinding.root).create()
 
-        // Observe expenses for this category
-        expensesViewModel.getExpensesByCategory(category.id).observe(this) { expenses ->
-            if (expenses.isEmpty()) {
-                dialogBinding.recyclerViewExpenses.visibility = android.view.View.GONE
-                dialogBinding.tvNoExpenses.visibility = android.view.View.VISIBLE
-            } else {
-                dialogBinding.recyclerViewExpenses.visibility = android.view.View.VISIBLE
-                dialogBinding.tvNoExpenses.visibility = android.view.View.GONE
-                expenseAdapter.submitList(expenses)
-            }
-        }
+        // Calculate date range for the selected month
+        val monthStart =
+                com.example.budgetdeluminator.utils.DateUtils.getMonthStart(
+                        selectedMonth.second,
+                        selectedMonth.first
+                )
+        val monthEnd =
+                com.example.budgetdeluminator.utils.DateUtils.getMonthEnd(
+                        selectedMonth.second,
+                        selectedMonth.first
+                )
+
+        // Observe expenses for this category within the selected month
+        expensesViewModel.getExpensesByCategoryInDateRange(category.id, monthStart, monthEnd)
+                .observe(this) { expenses ->
+                    if (expenses.isEmpty()) {
+                        dialogBinding.recyclerViewExpenses.visibility = android.view.View.GONE
+                        dialogBinding.tvNoExpenses.visibility = android.view.View.VISIBLE
+                    } else {
+                        dialogBinding.recyclerViewExpenses.visibility = android.view.View.VISIBLE
+                        dialogBinding.tvNoExpenses.visibility = android.view.View.GONE
+                        expenseAdapter.submitList(expenses)
+                    }
+                }
 
         dialogBinding.fabAddExpenseFromList.setOnClickListener {
             dialog.dismiss()
@@ -1525,45 +1548,28 @@ class MainActivity :
         // Refresh currency preferences instance
         currencyPreferences = CurrencyPreferences(this)
 
-        // Get current fragment and refresh it
+        // Get current fragment and refresh it using safer methods
         val currentFragment = supportFragmentManager.findFragmentById(binding.fragmentContainer.id)
         currentFragment?.let { fragment ->
             when (fragment) {
                 is HomeFragment -> {
-                    // Home fragment will automatically refresh when ViewModel observes data changes
-                    // Force refresh the currency display by recreating the fragment
-                    supportFragmentManager
-                            .beginTransaction()
-                            .detach(fragment)
-                            .attach(fragment)
-                            .commit()
+                    // Refresh home fragment's currency display
+                    fragment.refreshCurrency()
                 }
                 is AllExpensesFragment -> {
-                    // Refresh expenses fragment
-                    supportFragmentManager
-                            .beginTransaction()
-                            .detach(fragment)
-                            .attach(fragment)
-                            .commit()
+                    // Refresh expenses fragment's currency display
+                    fragment.refreshCurrency()
                 }
                 is CategoriesFragment -> {
-                    // Refresh categories fragment
-                    supportFragmentManager
-                            .beginTransaction()
-                            .detach(fragment)
-                            .attach(fragment)
-                            .commit()
+                    // Refresh categories fragment's currency display
+                    fragment.refreshCurrency()
                 }
                 is RecurringExpensesFragment -> {
-                    // Refresh recurring expenses fragment
-                    supportFragmentManager
-                            .beginTransaction()
-                            .detach(fragment)
-                            .attach(fragment)
-                            .commit()
+                    // Refresh recurring expenses fragment's currency display
+                    fragment.refreshCurrency()
                 }
                 else -> {
-                    // Handle any other fragment types - just refresh by detaching and reattaching
+                    // For unknown fragment types, use the safer detach/attach as fallback
                     supportFragmentManager
                             .beginTransaction()
                             .detach(fragment)

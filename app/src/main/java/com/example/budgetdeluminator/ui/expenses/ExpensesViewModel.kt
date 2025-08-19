@@ -14,44 +14,52 @@ import kotlinx.coroutines.launch
 
 class ExpensesViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: BudgetRepository
+        private val repository: BudgetRepository
 
-    val allCategories: LiveData<List<BudgetCategory>>
-    val allExpenses: LiveData<List<Expense>>
-    val allExpensesWithCategory: LiveData<List<ExpenseWithCategory>>
+        val allCategories: LiveData<List<BudgetCategory>>
+        val allExpenses: LiveData<List<Expense>>
+        val allExpensesWithCategory: LiveData<List<ExpenseWithCategory>>
 
-    private val _selectedCategoryId = MutableLiveData<Long?>()
-    val selectedCategoryId: LiveData<Long?> = _selectedCategoryId
+        private val _selectedCategoryId = MutableLiveData<Long?>()
+        val selectedCategoryId: LiveData<Long?> = _selectedCategoryId
 
-    init {
-        val database = BudgetDatabase.getDatabase(application)
-        repository =
-                BudgetRepository(
-                        database.budgetCategoryDao(),
-                        database.expenseDao(),
-                        database.recurringExpenseDao()
-                )
-        allCategories = repository.getAllCategories()
-        allExpenses = repository.getAllExpenses()
-        allExpensesWithCategory = repository.getAllExpensesWithCategory()
-    }
+        init {
+                val database = BudgetDatabase.getDatabase(application)
+                repository =
+                        BudgetRepository(
+                                database.budgetCategoryDao(),
+                                database.expenseDao(),
+                                database.recurringExpenseDao()
+                        )
+                allCategories = repository.getAllCategories()
+                allExpenses = repository.getAllExpenses()
+                allExpensesWithCategory = repository.getAllExpensesWithCategory()
+        }
 
-    fun getExpensesByCategory(categoryId: Long): LiveData<List<Expense>> {
-        return repository.getExpensesByCategory(categoryId)
-    }
+        fun getExpensesByCategory(categoryId: Long): LiveData<List<Expense>> {
+                return repository.getExpensesByCategory(categoryId)
+        }
 
-    fun insertExpense(expense: Expense) =
-            viewModelScope.launch { repository.insertExpense(expense) }
+        fun getExpensesByCategoryInDateRange(
+                categoryId: Long,
+                startDate: Long,
+                endDate: Long
+        ): LiveData<List<Expense>> {
+                return repository.getExpensesByCategoryInDateRange(categoryId, startDate, endDate)
+        }
 
-    fun updateExpense(expense: Expense) =
-            viewModelScope.launch { repository.updateExpense(expense) }
+        fun insertExpense(expense: Expense) =
+                viewModelScope.launch { repository.insertExpense(expense) }
 
-    fun deleteExpense(expense: Expense) =
-            viewModelScope.launch { repository.deleteExpense(expense) }
+        fun updateExpense(expense: Expense) =
+                viewModelScope.launch { repository.updateExpense(expense) }
 
-    fun deleteExpenseById(id: Long) = viewModelScope.launch { repository.deleteExpenseById(id) }
+        fun deleteExpense(expense: Expense) =
+                viewModelScope.launch { repository.deleteExpense(expense) }
 
-    fun setSelectedCategory(categoryId: Long?) {
-        _selectedCategoryId.value = categoryId
-    }
+        fun deleteExpenseById(id: Long) = viewModelScope.launch { repository.deleteExpenseById(id) }
+
+        fun setSelectedCategory(categoryId: Long?) {
+                _selectedCategoryId.value = categoryId
+        }
 }

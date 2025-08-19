@@ -21,11 +21,11 @@
             android:gravity="center_vertical">
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="@dimen/icon_medium"
+                android:layout_height="@dimen/icon_medium"
                 android:src="@drawable/ic_trending_up"
                 android:layout_gravity="center_vertical"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="@dimen/spacing_small" />
 
             <TextView
                 android:layout_width="0dp"
@@ -128,7 +128,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="@dimen/spacing_medium">
 
                     <!-- Total -->
                     <LinearLayout
@@ -136,8 +136,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingVertical="8dp"
-                        android:paddingHorizontal="4dp">
+                        android:paddingVertical="@dimen/spacing_small"
+                        android:paddingHorizontal="@dimen/spacing_micro">
 
                         <TextView
                             android:layout_width="0dp"
@@ -166,7 +166,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?attr/colorSurfaceVariant"
-                        android:layout_marginHorizontal="4dp"
+                        android:layout_marginHorizontal="@dimen/spacing_micro"
                         android:alpha="0.3" />
 
                     <!-- Spent -->
@@ -175,8 +175,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingVertical="8dp"
-                        android:paddingHorizontal="4dp">
+                        android:paddingVertical="@dimen/spacing_small"
+                        android:paddingHorizontal="@dimen/spacing_micro">
 
                         <TextView
                             android:layout_width="0dp"
@@ -205,7 +205,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:background="?attr/colorSurfaceVariant"
-                        android:layout_marginHorizontal="4dp"
+                        android:layout_marginHorizontal="@dimen/spacing_micro"
                         android:alpha="0.3" />
 
                     <!-- Remaining -->
@@ -214,8 +214,8 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:paddingVertical="8dp"
-                        android:paddingHorizontal="4dp">
+                        android:paddingVertical="@dimen/spacing_small"
+                        android:paddingHorizontal="@dimen/spacing_micro">
 
                         <TextView
                             android:layout_width="0dp"
@@ -254,6 +254,32 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
+        <!-- Loading State -->
+        <LinearLayout
+            android:id="@+id/layoutLoading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="visible">
+
+            <ProgressBar
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginBottom="16dp"
+                android:indeterminateTint="?attr/colorPrimary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Loading bad decisions..."
+                android:textSize="14sp"
+                android:textColor="?attr/secondaryTextColor"
+                android:textAlignment="center" />
+
+        </LinearLayout>
 
         <!-- Categories RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView

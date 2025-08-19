@@ -57,6 +57,13 @@ class BudgetRepository(
         fun getExpensesByCategory(categoryId: Long): LiveData<List<Expense>> =
                 expenseDao.getExpensesByCategory(categoryId)
 
+        fun getExpensesByCategoryInDateRange(
+                categoryId: Long,
+                startDate: Long,
+                endDate: Long
+        ): LiveData<List<Expense>> =
+                expenseDao.getExpensesByCategoryInDateRange(categoryId, startDate, endDate)
+
         suspend fun getTotalSpentByCategory(categoryId: Long): Double =
                 withContext(Dispatchers.IO) {
                         expenseDao.getTotalSpentByCategory(categoryId) ?: 0.0

@@ -1,6 +1,8 @@
 package com.example.budgetdeluminator.utils
 
+import android.app.Activity
 import android.content.Context
+import android.view.WindowManager
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -19,6 +21,11 @@ object BiometricAuthHelper {
     fun setBiometricEnabled(context: Context, enabled: Boolean) {
         val prefs = context.getSharedPreferences(BIOMETRIC_PREFS, Context.MODE_PRIVATE)
         prefs.edit().putBoolean(KEY_BIOMETRIC_ENABLED, enabled).apply()
+
+        // Update secure flag immediately when biometric setting changes
+        if (context is Activity) {
+            updateSecureFlag(context)
+        }
     }
 
     fun isBiometricAvailable(context: Context): Boolean {
@@ -101,5 +108,25 @@ object BiometricAuthHelper {
                         .build()
 
         biometricPrompt.authenticate(promptInfo)
+    }
+
+    /**
+     * Updates the secure flag on the activity window based on biometric authentication settings.
+     * When biometric authentication is enabled, the secure flag prevents screenshots and recent
+     * apps previews for enhanced security.
+     *
+     * @param activity The activity to apply the secure flag to
+     */
+    fun updateSecureFlag(activity: Activity) {
+        if (isBiometricEnabled(activity)) {
+            // Enable secure flag to prevent screenshots and recent apps preview
+            activity.window.setFlags(
+                    WindowManager.LayoutParams.FLAG_SECURE,
+                    WindowManager.LayoutParams.FLAG_SECURE
+            )
+        } else {
+            // Clear secure flag to allow screenshots
+            activity.window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+        }
     }
 }

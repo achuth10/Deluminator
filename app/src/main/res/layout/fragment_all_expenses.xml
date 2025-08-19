@@ -41,54 +41,85 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="?attr/primaryTextColor"
-                android:layout_marginBottom="12dp" />
+                android:layout_marginBottom="16dp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/tvDateRange"
-                style="@style/Widget.Material3.Button.TextButton"
+            <!-- Date Range Dropdown -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Last 30 days"
-                android:textSize="14sp"
-                android:textColor="?attr/secondaryTextColor"
-                android:gravity="start|center_vertical"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:drawableEnd="@android:drawable/arrow_down_float"
-                android:drawableTint="?attr/secondaryTextColor" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="@dimen/icon_medium"
+                    android:layout_height="@dimen/icon_medium"
+                    android:src="@android:drawable/ic_menu_recent_history"
+                    android:layout_marginEnd="@dimen/spacing_large"
+                    app:tint="@color/design_default_color_primary" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Date Range"
+                    app:boxStrokeColor="@color/design_default_color_primary"
+                    app:hintTextColor="@color/design_default_color_primary"
+                    app:endIconMode="dropdown_menu">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/actvDateRange"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="none"
+                        android:text="Last 30 days"
+                        android:paddingStart="@dimen/spacing_medium"
+                        android:paddingEnd="@dimen/spacing_medium"
+                        android:paddingTop="@dimen/spacing_small"
+                        android:paddingBottom="@dimen/spacing_small" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
 
             <!-- Summary for filtered period -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="?attr/cardBackgroundColor">
 
+                <!-- Total Expenses aligned with dropdown content -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="12dp">
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="@dimen/icon_text_start_margin"
+                    android:paddingTop="@dimen/spacing_large"
+                    android:paddingBottom="@dimen/spacing_large"
+                    android:paddingEnd="@dimen/spacing_large">
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Total Expenses:"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/primaryTextColor" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Total Expenses:"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/primaryTextColor"
+                        android:gravity="start|center_vertical" />
 
-                <TextView
-                    android:id="@+id/tvFilteredTotal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="$0.00"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="?attr/primaryTextColor" />
+                    <TextView
+                        android:id="@+id/tvFilteredTotal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₹ 90156.50"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/primaryTextColor"
+                        android:gravity="end|center_vertical" />
 
                 </LinearLayout>
 

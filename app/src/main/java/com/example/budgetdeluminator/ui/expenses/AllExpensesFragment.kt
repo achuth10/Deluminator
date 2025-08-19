@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.budgetdeluminator.data.entity.Expense
 import com.example.budgetdeluminator.data.model.ExpenseWithCategory
 import com.example.budgetdeluminator.databinding.FragmentAllExpensesBinding
+import com.example.budgetdeluminator.ui.adapter.DateRangeDropdownAdapter
 import com.example.budgetdeluminator.ui.adapter.GroupedExpenseAdapter
 import com.example.budgetdeluminator.utils.CurrencyPreferences
 import com.example.budgetdeluminator.utils.ExpenseGroupingUtils
@@ -26,10 +27,12 @@ class AllExpensesFragment : Fragment() {
     private lateinit var expenseAdapter: GroupedExpenseAdapter
     private val expensesViewModel: ExpensesViewModel by activityViewModels()
     private lateinit var currencyPreferences: CurrencyPreferences
+    private lateinit var dateRangeAdapter: DateRangeDropdownAdapter
     private val dateFormat = SimpleDateFormat("MMM dd, yyyy", Locale.US)
 
     private var startDate: Long = 0
     private var endDate: Long = 0
+    private var currentRangeValue: String = "last_30_days"
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -46,7 +49,7 @@ class AllExpensesFragment : Fragment() {
         currencyPreferences = CurrencyPreferences(requireContext())
         setupDefaultDateRange()
         setupRecyclerView()
-        setupClickListeners()
+        setupDateRangeDropdown()
         setupObservers()
     }
 
@@ -83,8 +86,54 @@ class AllExpensesFragment : Fragment() {
         }
     }
 
-    private fun setupClickListeners() {
-        binding.tvDateRange.setOnClickListener { showQuickDateRangeOptions() }
+    private fun setupDateRangeDropdown() {
+        val rangeNames =
+                listOf("Last 7 days", "Last 30 days", "Last 3 months", "This year", "Custom")
+        val rangeValues =
+                listOf("last_7_days", "last_30_days", "last_3_months", "this_year", "custom")
+
+        dateRangeAdapter = DateRangeDropdownAdapter(requireContext(), rangeNames, rangeValues)
+        binding.actvDateRange.setAdapter(dateRangeAdapter)
+
+        // Set initial selection
+        val initialPosition = dateRangeAdapter.getPositionOfRangeValue(currentRangeValue)
+        if (initialPosition >= 0) {
+            binding.actvDateRange.setText(dateRangeAdapter.getRangeNameAt(initialPosition), false)
+        }
+
+        // Handle selection
+        binding.actvDateRange.setOnItemClickListener { _, _, position, _ ->
+            val rangeValue = dateRangeAdapter.getRangeValueAt(position)
+            val rangeName = dateRangeAdapter.getRangeNameAt(position)
+
+            rangeValue?.let { value ->
+                currentRangeValue = value
+                rangeName?.let { name -> binding.actvDateRange.setText(name, false) }
+
+                when (value) {
+                    "last_7_days", "last_30_days", "last_3_months", "this_year" -> {
+                        applyPredefinedDateRange(value)
+                    }
+                    "custom" -> {
+                        showCustomDateRangePicker()
+                    }
+                }
+            }
+        }
+
+        // Handle focus change to ensure valid selection
+        binding.actvDateRange.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                // Reset to current selection if invalid text
+                val currentPosition = dateRangeAdapter.getPositionOfRangeValue(currentRangeValue)
+                if (currentPosition >= 0) {
+                    binding.actvDateRange.setText(
+                            dateRangeAdapter.getRangeNameAt(currentPosition),
+                            false
+                    )
+                }
+            }
+        }
     }
 
     private fun setupObservers() {
@@ -124,52 +173,37 @@ class AllExpensesFragment : Fragment() {
         binding.tvFilteredTotal.text = currencyPreferences.formatAmount(total)
     }
 
-    private fun updateDateRangeDisplay() {
-        val today = Calendar.getInstance()
-        val thirtyDaysAgo = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -30) }
-        val sevenDaysAgo = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -7) }
+    private fun applyPredefinedDateRange(rangeValue: String) {
+        val calendar = Calendar.getInstance()
+        endDate = calendar.timeInMillis
 
-        binding.tvDateRange.text =
-                when {
-                    isDateRange(thirtyDaysAgo.timeInMillis, today.timeInMillis) -> "Last 30 days"
-                    isDateRange(sevenDaysAgo.timeInMillis, today.timeInMillis) -> "Last 7 days"
-                    else ->
-                            "${dateFormat.format(Date(startDate))} - ${dateFormat.format(Date(endDate))}"
-                }
+        when (rangeValue) {
+            "last_7_days" -> calendar.add(Calendar.DAY_OF_MONTH, -7)
+            "last_30_days" -> calendar.add(Calendar.DAY_OF_MONTH, -30)
+            "last_3_months" -> calendar.add(Calendar.MONTH, -3)
+            "this_year" -> calendar.set(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        startDate = calendar.timeInMillis
+        setupObservers() // Refresh data
+    }
+
+    private fun updateDateRangeDisplay() {
+        // This method is now handled by the dropdown selection
+        // But we keep it for backward compatibility with custom date ranges
+        when (currentRangeValue) {
+            "custom" -> {
+                val customText =
+                        "${dateFormat.format(Date(startDate))} - ${dateFormat.format(Date(endDate))}"
+                binding.actvDateRange.setText(customText, false)
+            }
+        }
     }
 
     private fun isDateRange(expectedStart: Long, expectedEnd: Long): Boolean {
         val dayInMillis = 24 * 60 * 60 * 1000
         return Math.abs(startDate - expectedStart) < dayInMillis &&
                 Math.abs(endDate - expectedEnd) < dayInMillis
-    }
-
-    private fun showQuickDateRangeOptions() {
-        val options = arrayOf("Last 7 days", "Last 30 days", "Last 3 months", "This year", "Custom")
-
-        androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Select Date Range")
-                .setItems(options) { _, which ->
-                    when (which) {
-                        0, 1, 2, 3 -> {
-                            val calendar = Calendar.getInstance()
-                            endDate = calendar.timeInMillis
-
-                            when (which) {
-                                0 -> calendar.add(Calendar.DAY_OF_MONTH, -7)
-                                1 -> calendar.add(Calendar.DAY_OF_MONTH, -30)
-                                2 -> calendar.add(Calendar.MONTH, -3)
-                                3 -> calendar.set(Calendar.DAY_OF_YEAR, 1)
-                            }
-
-                            startDate = calendar.timeInMillis
-                            updateDateRangeDisplay()
-                            setupObservers() // Refresh data
-                        }
-                        4 -> showCustomDateRangePicker() // Custom option
-                    }
-                }
-                .show()
     }
 
     private fun showCustomDateRangePicker() {
@@ -198,6 +232,7 @@ class AllExpensesFragment : Fragment() {
                                                 )
                                                 endDate = endCalendar.timeInMillis
 
+                                                currentRangeValue = "custom"
                                                 updateDateRangeDisplay()
                                                 setupObservers() // Refresh data
                                             },

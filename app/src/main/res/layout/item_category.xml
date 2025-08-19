@@ -26,7 +26,7 @@
             android:singleLine="true"
             android:gravity="start"
             android:layout_marginBottom="@dimen/spacing_small"
-            android:paddingHorizontal="4dp" />
+            android:paddingHorizontal="@dimen/spacing_micro" />
 
         <!-- Budget Summary - Left/Right Layout with Dividers like main overview -->
         <LinearLayout
@@ -41,8 +41,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="6dp"
-                android:paddingHorizontal="4dp">
+                android:paddingVertical="@dimen/spacing_tiny"
+                android:paddingHorizontal="@dimen/spacing_micro">
 
                 <TextView
                     android:layout_width="0dp"
@@ -80,8 +80,8 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:paddingVertical="6dp"
-                android:paddingHorizontal="4dp">
+                android:paddingVertical="@dimen/spacing_tiny"
+                android:paddingHorizontal="@dimen/spacing_micro">
 
                 <TextView
                     android:layout_width="0dp"

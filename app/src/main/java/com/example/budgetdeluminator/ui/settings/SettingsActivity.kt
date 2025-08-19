@@ -41,6 +41,9 @@ class SettingsActivity : AppCompatActivity() {
         currencyPreferences = CurrencyPreferences(this)
         spendingRoastPrefs = getSharedPreferences(SPENDING_ROAST_PREFS, MODE_PRIVATE)
 
+        // Set secure flag if biometric authentication is enabled
+        BiometricAuthHelper.updateSecureFlag(this)
+
         setupToolbar()
         setupCurrencySettings()
         setupThemeSettings()
@@ -240,7 +243,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.ivBiometricInfo.setOnClickListener {
             showInfoDialog(
                     "Biometric Authentication",
-                    "Secure your budget app with fingerprint or face unlock. When enabled, you'll need to authenticate with biometrics each time you open the app.\n\nNote: Your device must have biometric authentication set up in system settings for this feature to work."
+                    "Secure your budget app with fingerprint or face unlock. When enabled:\n\n• You'll need to authenticate with biometrics each time you open the app\n• App content will be hidden from the recent apps screen\n• Screenshots will be prevented for enhanced security\n\nNote: Your device must have biometric authentication set up in system settings for this feature to work."
             )
         }
     }

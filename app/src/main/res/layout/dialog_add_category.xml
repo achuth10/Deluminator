@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="@dimen/spacing_xxlarge">
 
         <!-- Dialog Title -->
         <TextView
@@ -49,8 +49,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="textCapWords"
                     android:textColor="?attr/primaryTextColor"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="16dp" />
+                    android:paddingHorizontal="@dimen/spacing_large"
+                    android:paddingVertical="@dimen/spacing_large" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -67,8 +67,8 @@
                     android:layout_height="wrap_content"
                     android:inputType="numberDecimal"
                     android:textColor="?attr/primaryTextColor"
-                    android:paddingHorizontal="16dp"
-                    android:paddingVertical="16dp" />
+                    android:paddingHorizontal="@dimen/spacing_large"
+                    android:paddingVertical="@dimen/spacing_large" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -101,8 +101,8 @@
 
                     <View
                         android:id="@+id/colorOption1"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_green_selected"
                         android:clickable="true"
@@ -111,8 +111,8 @@
 
                     <View
                         android:id="@+id/colorOption2"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_blue"
                         android:clickable="true"
@@ -121,8 +121,8 @@
 
                     <View
                         android:id="@+id/colorOption3"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_orange"
                         android:clickable="true"
@@ -131,8 +131,8 @@
 
                     <View
                         android:id="@+id/colorOption4"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_pink"
                         android:clickable="true"
@@ -141,8 +141,8 @@
 
                     <View
                         android:id="@+id/colorOption5"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_purple"
                         android:clickable="true"
@@ -160,8 +160,8 @@
 
                     <View
                         android:id="@+id/colorOption6"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_red"
                         android:clickable="true"
@@ -170,8 +170,8 @@
 
                     <View
                         android:id="@+id/colorOption7"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_teal"
                         android:clickable="true"
@@ -180,8 +180,8 @@
 
                     <View
                         android:id="@+id/colorOption8"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_indigo"
                         android:clickable="true"
@@ -190,8 +190,8 @@
 
                     <View
                         android:id="@+id/colorOption9"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_amber"
                         android:clickable="true"
@@ -200,8 +200,8 @@
 
                     <View
                         android:id="@+id/colorOption10"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="@dimen/icon_color_picker"
+                        android:layout_height="@dimen/icon_color_picker"
                         android:layout_margin="6dp"
                         android:background="@drawable/color_circle_brown"
                         android:clickable="true"

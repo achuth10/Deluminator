@@ -18,6 +18,15 @@ interface ExpenseDao {
         @Query("SELECT * FROM expenses WHERE categoryId = :categoryId ORDER BY createdAt DESC")
         fun getExpensesByCategory(categoryId: Long): LiveData<List<Expense>>
 
+        @Query(
+                "SELECT * FROM expenses WHERE categoryId = :categoryId AND createdAt >= :startDate AND createdAt <= :endDate ORDER BY createdAt DESC"
+        )
+        fun getExpensesByCategoryInDateRange(
+                categoryId: Long,
+                startDate: Long,
+                endDate: Long
+        ): LiveData<List<Expense>>
+
         @Query("SELECT COUNT(*) FROM expenses WHERE categoryId = :categoryId")
         suspend fun getExpenseCountByCategory(categoryId: Long): Int
 

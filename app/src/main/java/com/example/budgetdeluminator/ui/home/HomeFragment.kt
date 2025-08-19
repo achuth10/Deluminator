@@ -39,6 +39,10 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         currencyPreferences = CurrencyPreferences(requireContext())
+
+        // Hide content initially to prevent flickering
+        initializeLoadingState()
+
         setupRecyclerView()
         setupObservers()
         setupClickListeners()
@@ -76,22 +80,49 @@ class HomeFragment : Fragment() {
         binding.chipCurrentMonth.setOnClickListener { showMonthSelector() }
     }
 
+    private fun initializeLoadingState() {
+        // Hide budget overview content initially
+        binding.apply {
+            chipCurrentMonth.text = ""
+            tvTotalBudget.text = ""
+            tvTotalSpent.text = ""
+            tvRemaining.text = ""
+            progressBarOverall.progress = 0
+
+            // Show loading state and hide other content
+            layoutLoading.visibility = View.VISIBLE
+            recyclerViewCategories.visibility = View.GONE
+            layoutEmptyState.visibility = View.GONE
+        }
+    }
+
     private fun setupObservers() {
         homeViewModel.categoriesWithExpenses.observe(viewLifecycleOwner) { categoriesWithExpenses ->
             categoryAdapter.submitList(categoriesWithExpenses)
             updateOverviewData()
 
-            // Show/hide empty state
-            if (categoriesWithExpenses.isEmpty()) {
-                binding.recyclerViewCategories.visibility = View.GONE
-                binding.layoutEmptyState.visibility = View.VISIBLE
-            } else {
-                binding.recyclerViewCategories.visibility = View.VISIBLE
-                binding.layoutEmptyState.visibility = View.GONE
-            }
+            // Show content now that data is loaded
+            showContentWithData(categoriesWithExpenses)
         }
 
         homeViewModel.selectedMonth.observe(viewLifecycleOwner) { _ -> updateCurrentMonthDisplay() }
+    }
+
+    private fun showContentWithData(
+            categoriesWithExpenses:
+                    List<com.example.budgetdeluminator.data.model.CategoryWithExpenses>
+    ) {
+        // Hide loading state now that data is loaded
+        binding.layoutLoading.visibility = View.GONE
+
+        // Show/hide appropriate content based on data
+        if (categoriesWithExpenses.isEmpty()) {
+            binding.recyclerViewCategories.visibility = View.GONE
+            binding.layoutEmptyState.visibility = View.VISIBLE
+        } else {
+            binding.recyclerViewCategories.visibility = View.VISIBLE
+            binding.layoutEmptyState.visibility = View.GONE
+        }
     }
 
     private fun updateOverviewData() {

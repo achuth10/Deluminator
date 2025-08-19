@@ -12,7 +12,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="@dimen/spacing_xxlarge">
 
     <!-- Dialog Header -->
     <LinearLayout
@@ -36,8 +36,8 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCloseExpenseForm"
             style="@style/Widget.Material3.Button.IconButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="@dimen/min_touch_target"
+            android:layout_height="@dimen/min_touch_target"
             app:icon="@android:drawable/ic_menu_close_clear_cancel"
             app:iconTint="?attr/primaryTextColor"
             android:background="?android:attr/selectableItemBackgroundBorderless" />
@@ -73,8 +73,8 @@
                 android:clickable="true"
                 android:focusable="false"
                 android:inputType="none"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp" />
+                android:paddingHorizontal="@dimen/spacing_large"
+                android:paddingVertical="@dimen/spacing_large" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -95,8 +95,8 @@
                 android:clickable="true"
                 android:focusable="false"
                 android:inputType="none"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp" />
+                android:paddingHorizontal="@dimen/spacing_large"
+                android:paddingVertical="@dimen/spacing_large" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -119,8 +119,8 @@
                 android:inputType="none"
                 android:maxLines="1"
                 android:ellipsize="end"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp" />
+                android:paddingHorizontal="@dimen/spacing_large"
+                android:paddingVertical="@dimen/spacing_large" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -139,8 +139,8 @@
                 android:inputType="textCapSentences"
                 android:maxLines="2"
                 android:textColor="?attr/primaryTextColor"
-                android:paddingHorizontal="16dp"
-                android:paddingVertical="16dp" />
+                android:paddingHorizontal="@dimen/spacing_large"
+                android:paddingVertical="@dimen/spacing_large" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
