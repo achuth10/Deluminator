@@ -343,7 +343,15 @@ class MainActivity :
 
             if (finalValue > 0) {
                 dialog.dismiss()
-                showExpenseFormDialog(finalValue, preselectedCategory)
+                // If a category is preselected, go directly to expense dialog
+                if (preselectedCategory != null) {
+                    showExpenseFormDialog(finalValue, preselectedCategory)
+                } else {
+                    // Otherwise, open category selector first, then expense dialog
+                    showCategorySelectionDialog { selectedCategory ->
+                        showExpenseFormDialog(finalValue, selectedCategory)
+                    }
+                }
             } else {
                 Toast.makeText(
                                 this,
@@ -600,6 +608,24 @@ class MainActivity :
                             )
                         }
                         else -> {
+                            // Debug logging
+                            android.util.Log.d(
+                                    "ExpenseCreation",
+                                    "Creating expense with categoryId: ${category.id}, categoryName: ${category.name}"
+                            )
+
+                            // Validate category ID is not 0 (unsaved category)
+                            if (category.id == 0L) {
+                                ErrorHandler.handleValidationError(
+                                        this,
+                                        ValidationResult.Error(
+                                                "Invalid category selected. Please select a valid category."
+                                        ),
+                                        dialogBinding.root
+                                )
+                                return@setOnClickListener
+                            }
+
                             val expense =
                                     Expense(
                                             categoryId = category.id,
@@ -613,8 +639,21 @@ class MainActivity :
                                     "saving expense",
                                     dialogBinding.root
                             ) {
-                                expensesViewModel.insertExpense(expense)
-                                dialog.dismiss()
+                                try {
+                                    expensesViewModel.insertExpense(expense)
+                                    dialog.dismiss()
+                                } catch (e: IllegalArgumentException) {
+                                    android.util.Log.e(
+                                            "ExpenseCreation",
+                                            "Category validation failed: ${e.message}"
+                                    )
+                                    Toast.makeText(
+                                                    this@MainActivity,
+                                                    "Error: ${e.message}",
+                                                    Toast.LENGTH_LONG
+                                            )
+                                            .show()
+                                }
                             }
                         }
                     }
@@ -634,8 +673,16 @@ class MainActivity :
             dialogBinding.tvSelectedCategory.setText(preselectedCategory.name)
         } else {
             categoriesViewModel.allCategories.observe(this) { categories ->
+                android.util.Log.d(
+                        "ExpenseDialog",
+                        "Categories loaded: ${categories.size} categories"
+                )
                 if (categories.isNotEmpty() && selectedCategory == null) {
                     selectedCategory = categories[0]
+                    android.util.Log.d(
+                            "ExpenseDialog",
+                            "Auto-selected category: ${categories[0].id} - ${categories[0].name}"
+                    )
                     dialogBinding.tvSelectedCategory.setText(categories[0].name)
                 }
             }
@@ -1068,9 +1115,10 @@ class MainActivity :
                         if (categoryToEdit != null) {
                             categoriesViewModel.updateCategory(category)
                         } else {
-                            categoriesViewModel.insertCategory(category)
-                            // If this is a new category and we have a callback, call it
-                            onCategoryCreated?.invoke(category)
+                            val insertedId = categoriesViewModel.insertCategoryAndGetId(category)
+                            // If this is a new category and we have a callback, call it with the
+                            // proper ID
+                            onCategoryCreated?.invoke(category.copy(id = insertedId))
                         }
                         dialog.dismiss()
                     } catch (e: Exception) {

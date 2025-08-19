@@ -107,4 +107,11 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
             _availableMonths.value = months
         }
     }
+
+    fun reorderCategories(categoriesWithExpenses: List<CategoryWithExpenses>) {
+        viewModelScope.launch {
+            val categories = categoriesWithExpenses.map { it.category }
+            repository.reorderCategories(categories)
+        }
+    }
 }

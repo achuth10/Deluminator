@@ -8,8 +8,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import com.example.budgetdeluminator.databinding.FragmentHomeBinding
 import com.example.budgetdeluminator.ui.adapter.CategoryAdapter
+import com.example.budgetdeluminator.ui.adapter.CategoryItemTouchHelperCallback
 import com.example.budgetdeluminator.utils.CurrencyPreferences
 import com.example.budgetdeluminator.utils.DateUtils
 import com.example.budgetdeluminator.utils.MoneyJokes
@@ -60,11 +62,9 @@ class HomeFragment : Fragment() {
                                     categoryWithExpenses
                             )
                         },
-                        onCategoryLongClick = { categoryWithExpenses ->
-                            // Same as regular click for now
-                            (activity as? OnCategoryClickListener)?.onCategoryClicked(
-                                    categoryWithExpenses
-                            )
+                        onCategoryReorder = { reorderedCategories ->
+                            // Handle category reordering
+                            homeViewModel.reorderCategories(reorderedCategories)
                         }
                 )
 
@@ -74,6 +74,11 @@ class HomeFragment : Fragment() {
             // Add some padding for better spacing
             setPadding(4, 0, 4, 0)
         }
+
+        // Set up drag and drop functionality
+        val itemTouchHelperCallback = CategoryItemTouchHelperCallback(categoryAdapter)
+        val itemTouchHelper = ItemTouchHelper(itemTouchHelperCallback)
+        itemTouchHelper.attachToRecyclerView(binding.recyclerViewCategories)
     }
 
     private fun setupClickListeners() {

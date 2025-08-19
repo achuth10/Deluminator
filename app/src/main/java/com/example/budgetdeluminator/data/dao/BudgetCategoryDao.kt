@@ -7,8 +7,11 @@ import com.example.budgetdeluminator.data.entity.BudgetCategory
 @Dao
 interface BudgetCategoryDao {
 
-    @Query("SELECT * FROM budget_categories ORDER BY name ASC")
+    @Query("SELECT * FROM budget_categories ORDER BY displayOrder ASC, name ASC")
     fun getAllCategories(): LiveData<List<BudgetCategory>>
+
+    @Query("SELECT * FROM budget_categories ORDER BY displayOrder ASC, name ASC")
+    suspend fun getAllCategoriesSync(): List<BudgetCategory>
 
     @Query("SELECT * FROM budget_categories WHERE id = :id")
     suspend fun getCategoryById(id: Long): BudgetCategory?
@@ -21,4 +24,9 @@ interface BudgetCategoryDao {
     @Delete suspend fun deleteCategory(category: BudgetCategory)
 
     @Query("DELETE FROM budget_categories WHERE id = :id") suspend fun deleteCategoryById(id: Long)
+
+    @Query("UPDATE budget_categories SET displayOrder = :order WHERE id = :id")
+    suspend fun updateCategoryOrder(id: Long, order: Int)
+
+    @Query("SELECT MAX(displayOrder) FROM budget_categories") suspend fun getMaxDisplayOrder(): Int?
 }

@@ -44,6 +44,19 @@ class CategoriesViewModel(application: Application) : AndroidViewModel(applicati
                         }
                 }
 
+        suspend fun insertCategoryAndGetId(category: BudgetCategory): Long {
+                return try {
+                        val insertedId = repository.insertCategory(category)
+                        _operationResult.value =
+                                OperationResult.Success("Category created successfully")
+                        insertedId
+                } catch (e: Exception) {
+                        _operationResult.value =
+                                OperationResult.Error("Failed to create category: ${e.message}")
+                        throw e
+                }
+        }
+
         fun updateCategory(category: BudgetCategory) =
                 viewModelScope.launch {
                         try {

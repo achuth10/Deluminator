@@ -27,8 +27,26 @@ class BudgetRepository(
         suspend fun getCategoryById(id: Long): BudgetCategory? =
                 withContext(Dispatchers.IO) { budgetCategoryDao.getCategoryById(id) }
 
+        suspend fun getAllCategoriesSync(): List<BudgetCategory> =
+                withContext(Dispatchers.IO) { budgetCategoryDao.getAllCategoriesSync() }
+
         suspend fun insertCategory(category: BudgetCategory): Long =
-                withContext(Dispatchers.IO) { budgetCategoryDao.insertCategory(category) }
+                withContext(Dispatchers.IO) {
+                        // If no display order is set, assign the next available order
+                        val categoryWithOrder =
+                                if (category.displayOrder == 0) {
+                                        val maxOrder = budgetCategoryDao.getMaxDisplayOrder() ?: 0
+                                        category.copy(displayOrder = maxOrder + 1)
+                                } else {
+                                        category
+                                }
+                        val insertedId = budgetCategoryDao.insertCategory(categoryWithOrder)
+                        android.util.Log.d(
+                                "BudgetRepository",
+                                "Inserted category: ${categoryWithOrder.name} with ID: $insertedId"
+                        )
+                        insertedId
+                }
 
         suspend fun updateCategory(category: BudgetCategory) =
                 withContext(Dispatchers.IO) { budgetCategoryDao.updateCategory(category) }
@@ -47,6 +65,19 @@ class BudgetRepository(
 
         suspend fun getCategoryExpenseCount(categoryId: Long): Int =
                 withContext(Dispatchers.IO) { expenseDao.getExpenseCountByCategory(categoryId) }
+
+        suspend fun updateCategoryOrder(id: Long, order: Int) =
+                withContext(Dispatchers.IO) { budgetCategoryDao.updateCategoryOrder(id, order) }
+
+        suspend fun getMaxDisplayOrder(): Int =
+                withContext(Dispatchers.IO) { budgetCategoryDao.getMaxDisplayOrder() ?: 0 }
+
+        suspend fun reorderCategories(categories: List<BudgetCategory>) =
+                withContext(Dispatchers.IO) {
+                        categories.forEachIndexed { index, category ->
+                                budgetCategoryDao.updateCategoryOrder(category.id, index)
+                        }
+                }
 
         // Expense operations
         fun getAllExpenses(): LiveData<List<Expense>> = expenseDao.getAllExpenses()
@@ -84,7 +115,16 @@ class BudgetRepository(
                 }
 
         suspend fun insertExpense(expense: Expense): Long =
-                withContext(Dispatchers.IO) { expenseDao.insertExpense(expense) }
+                withContext(Dispatchers.IO) {
+                        // Validate that the category exists before inserting expense
+                        val category = budgetCategoryDao.getCategoryById(expense.categoryId)
+                        if (category == null) {
+                                throw IllegalArgumentException(
+                                        "Category with ID ${expense.categoryId} does not exist"
+                                )
+                        }
+                        expenseDao.insertExpense(expense)
+                }
 
         suspend fun updateExpense(expense: Expense) =
                 withContext(Dispatchers.IO) { expenseDao.updateExpense(expense) }
@@ -94,6 +134,9 @@ class BudgetRepository(
 
         suspend fun deleteExpenseById(id: Long) =
                 withContext(Dispatchers.IO) { expenseDao.deleteExpenseById(id) }
+
+        suspend fun cleanupOrphanedExpenses(): Int =
+                withContext(Dispatchers.IO) { expenseDao.deleteOrphanedExpenses() }
 
         // Combined operations for home screen
         fun getCategoriesWithExpenses(): LiveData<List<CategoryWithExpenses>> {

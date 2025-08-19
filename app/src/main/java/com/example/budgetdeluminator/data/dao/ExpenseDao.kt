@@ -65,4 +65,7 @@ interface ExpenseDao {
 
         @Query("SELECT DISTINCT createdAt FROM expenses ORDER BY createdAt DESC")
         suspend fun getAllExpenseDates(): List<Long>
+
+        @Query("DELETE FROM expenses WHERE categoryId NOT IN (SELECT id FROM budget_categories)")
+        suspend fun deleteOrphanedExpenses(): Int
 }

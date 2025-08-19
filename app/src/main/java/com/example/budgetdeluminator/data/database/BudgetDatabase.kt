@@ -14,7 +14,7 @@ import com.example.budgetdeluminator.data.entity.RecurringExpense
 
 @Database(
         entities = [BudgetCategory::class, Expense::class, RecurringExpense::class],
-        version = 4,
+        version = 5,
         exportSchema = false
 )
 abstract class BudgetDatabase : RoomDatabase() {
@@ -40,8 +40,14 @@ abstract class BudgetDatabase : RoomDatabase() {
                                                 object : RoomDatabase.Callback() {
                                                     override fun onOpen(db: SupportSQLiteDatabase) {
                                                         super.onOpen(db)
-                                                        // Enable foreign key constraints
+                                                        // Enable foreign key constraints with
+                                                        // proper validation
                                                         db.execSQL("PRAGMA foreign_keys=ON")
+                                                        // Clean up any orphaned expenses from
+                                                        // schema changes
+                                                        db.execSQL(
+                                                                "DELETE FROM expenses WHERE categoryId NOT IN (SELECT id FROM budget_categories)"
+                                                        )
                                                     }
                                                 }
                                         )

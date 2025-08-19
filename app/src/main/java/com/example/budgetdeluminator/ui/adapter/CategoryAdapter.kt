@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.budgetdeluminator.data.model.CategoryWithExpenses
@@ -14,10 +15,19 @@ import com.example.budgetdeluminator.utils.CurrencyPreferences
 class CategoryAdapter(
         private val context: Context,
         private val onCategoryClick: (CategoryWithExpenses) -> Unit,
-        private val onCategoryLongClick: (CategoryWithExpenses) -> Unit
+        private val onCategoryReorder: (List<CategoryWithExpenses>) -> Unit
 ) : ListAdapter<CategoryWithExpenses, CategoryAdapter.CategoryViewHolder>(CategoryDiffCallback()) {
 
     private val currencyPreferences = CurrencyPreferences(context)
+    private var currentList = mutableListOf<CategoryWithExpenses>()
+
+    override fun submitList(list: List<CategoryWithExpenses>?) {
+        super.submitList(list)
+        currentList.clear()
+        if (list != null) {
+            currentList.addAll(list)
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoryViewHolder {
         val binding =
@@ -69,12 +79,24 @@ class CategoryAdapter(
 
                 // Set click listeners
                 root.setOnClickListener { onCategoryClick(categoryWithExpenses) }
-                root.setOnLongClickListener {
-                    onCategoryLongClick(categoryWithExpenses)
-                    true
-                }
+                // Long press is handled by ItemTouchHelper for drag and drop functionality
             }
         }
+    }
+
+    // Drag and drop functionality
+    fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+        if (fromPosition < currentList.size && toPosition < currentList.size) {
+            val movedItem = currentList.removeAt(fromPosition)
+            currentList.add(toPosition, movedItem)
+            notifyItemMoved(fromPosition, toPosition)
+            return true
+        }
+        return false
+    }
+
+    fun onItemMoveFinished() {
+        onCategoryReorder(currentList.toList())
     }
 
     class CategoryDiffCallback : DiffUtil.ItemCallback<CategoryWithExpenses>() {
@@ -91,5 +113,49 @@ class CategoryAdapter(
         ): Boolean {
             return oldItem == newItem
         }
+    }
+}
+
+class CategoryItemTouchHelperCallback(private val adapter: CategoryAdapter) :
+        ItemTouchHelper.Callback() {
+
+    override fun isLongPressDragEnabled(): Boolean = true
+    override fun isItemViewSwipeEnabled(): Boolean = false
+
+    override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+    ): Int {
+        val dragFlags =
+                ItemTouchHelper.UP or
+                        ItemTouchHelper.DOWN or
+                        ItemTouchHelper.LEFT or
+                        ItemTouchHelper.RIGHT
+        return makeMovementFlags(dragFlags, 0)
+    }
+
+    override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+    ): Boolean {
+        return adapter.onItemMove(viewHolder.adapterPosition, target.adapterPosition)
+    }
+
+    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        // Not used since swiping is disabled
+    }
+
+    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+        super.onSelectedChanged(viewHolder, actionState)
+        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+            viewHolder?.itemView?.alpha = 0.8f
+        }
+    }
+
+    override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+        super.clearView(recyclerView, viewHolder)
+        viewHolder.itemView.alpha = 1.0f
+        adapter.onItemMoveFinished()
     }
 }

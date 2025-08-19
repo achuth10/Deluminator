@@ -230,7 +230,7 @@
                 android:layout_height="wrap_content"
                 android:text="Cancel"
                 android:layout_marginEnd="8dp"
-                android:minWidth="80dp" />
+                android:minWidth="90dp" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
@@ -238,7 +238,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Save"
-                android:minWidth="80dp" />
+                android:minWidth="90dp" />
 
         </LinearLayout>
 
