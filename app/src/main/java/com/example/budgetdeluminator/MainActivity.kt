@@ -608,12 +608,6 @@ class MainActivity :
                             )
                         }
                         else -> {
-                            // Debug logging
-                            android.util.Log.d(
-                                    "ExpenseCreation",
-                                    "Creating expense with categoryId: ${category.id}, categoryName: ${category.name}"
-                            )
-
                             // Validate category ID is not 0 (unsaved category)
                             if (category.id == 0L) {
                                 ErrorHandler.handleValidationError(
@@ -673,16 +667,8 @@ class MainActivity :
             dialogBinding.tvSelectedCategory.setText(preselectedCategory.name)
         } else {
             categoriesViewModel.allCategories.observe(this) { categories ->
-                android.util.Log.d(
-                        "ExpenseDialog",
-                        "Categories loaded: ${categories.size} categories"
-                )
                 if (categories.isNotEmpty() && selectedCategory == null) {
                     selectedCategory = categories[0]
-                    android.util.Log.d(
-                            "ExpenseDialog",
-                            "Auto-selected category: ${categories[0].id} - ${categories[0].name}"
-                    )
                     dialogBinding.tvSelectedCategory.setText(categories[0].name)
                 }
             }

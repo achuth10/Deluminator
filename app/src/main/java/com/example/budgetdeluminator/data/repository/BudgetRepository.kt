@@ -41,10 +41,6 @@ class BudgetRepository(
                                         category
                                 }
                         val insertedId = budgetCategoryDao.insertCategory(categoryWithOrder)
-                        android.util.Log.d(
-                                "BudgetRepository",
-                                "Inserted category: ${categoryWithOrder.name} with ID: $insertedId"
-                        )
                         insertedId
                 }
 
