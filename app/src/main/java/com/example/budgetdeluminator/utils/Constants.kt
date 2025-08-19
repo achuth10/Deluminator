@@ -66,19 +66,6 @@ object Constants {
         const val SUCCESS_CATEGORY_UPDATED = "Category updated successfully"
         const val SUCCESS_CATEGORY_DELETED = "Category deleted successfully"
 
-        // Default Categories
-        val DEFAULT_CATEGORIES =
-                listOf(
-                        CategoryDefault("Food & Dining", 500.0, "#4CAF50"),
-                        CategoryDefault("Transportation", 300.0, "#2196F3"),
-                        CategoryDefault("Shopping", 400.0, "#FF9800"),
-                        CategoryDefault("Entertainment", 200.0, "#E91E63"),
-                        CategoryDefault("Bills & Utilities", 800.0, "#9C27B0"),
-                        CategoryDefault("Healthcare", null, "#FF5722"), // Tracking-only example
-                        CategoryDefault("Personal Care", 150.0, "#00BCD4"),
-                        CategoryDefault("Education", 250.0, "#3F51B5")
-                )
-
         // Regular Expressions
         const val REGEX_CATEGORY_NAME = "^[a-zA-Z0-9\\s&-]+$"
         const val REGEX_AMOUNT = "^\\d+(\\.\\d{1,2})?$"

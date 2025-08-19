@@ -46,7 +46,7 @@ class CategoryManagementAdapter(
                         if (category.budgetLimit != null) {
                             "Budget: ${currencyPreferences.formatAmount(category.budgetLimit)}"
                         } else {
-                            "Tracking Only"
+                            "Unlimited"
                         }
 
                 // Set card background color based on category color

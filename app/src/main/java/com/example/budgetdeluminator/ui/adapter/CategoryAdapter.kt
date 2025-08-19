@@ -57,8 +57,9 @@ class CategoryAdapter(
 
                 if (isTrackingOnly) {
                     // Tracking-only category display
-                    tvRemainingAmount.text = "Tracking Only"
+                    tvRemainingAmount.text = "Unlimited"
                     tvRemainingAmount.setTextColor(Color.parseColor("#757575")) // Neutral gray
+                    tvRemainingAmount.textSize = 12f // Make text smaller for "Unlimited" only
 
                     // Hide progress bar for tracking-only categories
                     progressBarCategory.visibility = View.GONE
@@ -74,6 +75,8 @@ class CategoryAdapter(
                                 else -> Color.parseColor("#4CAF50") // Green for normal
                             }
                     )
+                    // Keep normal text size for budget amounts (same as spent amount)
+                    tvRemainingAmount.textSize = 16f
 
                     // Show and set progress bar with three-color system
                     progressBarCategory.visibility = View.VISIBLE

@@ -16,7 +16,7 @@ interface BudgetCategoryDao {
     @Query("SELECT * FROM budget_categories WHERE id = :id")
     suspend fun getCategoryById(id: Long): BudgetCategory?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertCategory(category: BudgetCategory): Long
 
     @Update suspend fun updateCategory(category: BudgetCategory)
@@ -29,4 +29,7 @@ interface BudgetCategoryDao {
     suspend fun updateCategoryOrder(id: Long, order: Int)
 
     @Query("SELECT MAX(displayOrder) FROM budget_categories") suspend fun getMaxDisplayOrder(): Int?
+
+    @Query("SELECT * FROM budget_categories WHERE name = :name LIMIT 1")
+    suspend fun getCategoryByName(name: String): BudgetCategory?
 }

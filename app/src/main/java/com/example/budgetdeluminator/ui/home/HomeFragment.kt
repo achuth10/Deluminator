@@ -287,7 +287,7 @@ class HomeFragment : Fragment() {
                     "• Budgeted categories: ${CurrencyPreferences(requireContext()).formatAmountWithoutDecimals(totalSpentBudgeted)}\n"
             )
             append(
-                    "• Tracking-only categories: ${CurrencyPreferences(requireContext()).formatAmountWithoutDecimals(totalSpentTracking)}\n\n"
+                    "• Unlimited categories: ${CurrencyPreferences(requireContext()).formatAmountWithoutDecimals(totalSpentTracking)}\n\n"
             )
             append(
                     "• Total Spent: ${CurrencyPreferences(requireContext()).formatAmountWithoutDecimals(totalSpent)}\n\n"

@@ -30,9 +30,9 @@ abstract class BudgetDatabase : RoomDatabase() {
         /** Migration from version 5 to 6 Make budgetLimit nullable for tracking-only categories */
         private val MIGRATION_5_6 =
                 object : Migration(5, 6) {
-                    override fun migrate(database: SupportSQLiteDatabase) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
                         // Create a new table with the updated schema
-                        database.execSQL(
+                        db.execSQL(
                                 """
                                 CREATE TABLE budget_categories_new (
                                     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -46,7 +46,7 @@ abstract class BudgetDatabase : RoomDatabase() {
                         )
 
                         // Copy data from old table to new table
-                        database.execSQL(
+                        db.execSQL(
                                 """
                                 INSERT INTO budget_categories_new (id, name, budgetLimit, color, createdAt, displayOrder)
                                 SELECT id, name, budgetLimit, color, createdAt, displayOrder
@@ -55,12 +55,10 @@ abstract class BudgetDatabase : RoomDatabase() {
                         )
 
                         // Drop the old table
-                        database.execSQL("DROP TABLE budget_categories")
+                        db.execSQL("DROP TABLE budget_categories")
 
                         // Rename the new table to the original name
-                        database.execSQL(
-                                "ALTER TABLE budget_categories_new RENAME TO budget_categories"
-                        )
+                        db.execSQL("ALTER TABLE budget_categories_new RENAME TO budget_categories")
                     }
                 }
 
@@ -70,17 +68,17 @@ abstract class BudgetDatabase : RoomDatabase() {
          */
         private val MIGRATION_4_5 =
                 object : Migration(4, 5) {
-                    override fun migrate(database: SupportSQLiteDatabase) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
                         // Add new columns to expenses table with default values
-                        database.execSQL(
+                        db.execSQL(
                                 "ALTER TABLE expenses ADD COLUMN source TEXT NOT NULL DEFAULT 'MANUAL'"
                         )
-                        database.execSQL(
+                        db.execSQL(
                                 "ALTER TABLE expenses ADD COLUMN recurringExpenseId INTEGER DEFAULT NULL"
                         )
 
                         // Create index for better performance on recurring expense lookups
-                        database.execSQL(
+                        db.execSQL(
                                 "CREATE INDEX IF NOT EXISTS index_expenses_recurringExpenseId ON expenses (recurringExpenseId)"
                         )
                     }
@@ -89,7 +87,7 @@ abstract class BudgetDatabase : RoomDatabase() {
         /** Migration from version 3 to 4 Example migration for future reference */
         private val MIGRATION_3_4 =
                 object : Migration(3, 4) {
-                    override fun migrate(database: SupportSQLiteDatabase) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
                         // This would contain the actual migration logic for 3->4
                         // Keeping as example for future migrations
                     }
@@ -98,7 +96,7 @@ abstract class BudgetDatabase : RoomDatabase() {
         /** Migration from version 2 to 3 Example migration for future reference */
         private val MIGRATION_2_3 =
                 object : Migration(2, 3) {
-                    override fun migrate(database: SupportSQLiteDatabase) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
                         // This would contain the actual migration logic for 2->3
                         // Keeping as example for future migrations
                     }
@@ -107,7 +105,7 @@ abstract class BudgetDatabase : RoomDatabase() {
         /** Migration from version 1 to 2 Example migration for future reference */
         private val MIGRATION_1_2 =
                 object : Migration(1, 2) {
-                    override fun migrate(database: SupportSQLiteDatabase) {
+                    override fun migrate(db: SupportSQLiteDatabase) {
                         // This would contain the actual migration logic for 1->2
                         // Keeping as example for future migrations
                     }

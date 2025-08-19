@@ -10,9 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.budgetdeluminator.data.entity.BudgetCategory
 import com.example.budgetdeluminator.data.entity.Expense
@@ -1161,21 +1159,19 @@ class MainActivity :
                             )
 
             lifecycleScope.launch {
-                repeatOnLifecycle(Lifecycle.State.STARTED) {
-                    try {
-                        if (categoryToEdit != null) {
-                            categoriesViewModel.updateCategory(category)
-                        } else {
-                            val insertedId = categoriesViewModel.insertCategoryAndGetId(category)
-                            // If this is a new category and we have a callback, call it with the
-                            // proper ID
-                            onCategoryCreated?.invoke(category.copy(id = insertedId))
-                        }
-                        dialog.dismiss()
-                    } catch (e: Exception) {
-                        Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT)
-                                .show()
+                try {
+                    if (categoryToEdit != null) {
+                        categoriesViewModel.updateCategory(category)
+                    } else {
+                        val insertedId = categoriesViewModel.insertCategoryAndGetId(category)
+                        // If this is a new category and we have a callback, call it with the
+                        // proper ID
+                        onCategoryCreated?.invoke(category.copy(id = insertedId))
                     }
+                    dialog.dismiss()
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Error: ${e.message}", Toast.LENGTH_SHORT)
+                            .show()
                 }
             }
         }

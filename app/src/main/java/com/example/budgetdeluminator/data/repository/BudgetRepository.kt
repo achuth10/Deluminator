@@ -32,6 +32,12 @@ class BudgetRepository(
 
         suspend fun insertCategory(category: BudgetCategory): Long =
                 withContext(Dispatchers.IO) {
+                        // Check if category with same name already exists
+                        val existingCategory = budgetCategoryDao.getCategoryByName(category.name)
+                        if (existingCategory != null) {
+                                return@withContext existingCategory.id
+                        }
+
                         // If no display order is set, assign the next available order
                         val categoryWithOrder =
                                 if (category.displayOrder == 0) {
