@@ -41,4 +41,45 @@
         app:backgroundTint="?attr/colorPrimary"
         app:tint="?attr/colorOnPrimary" />
 
+    <!-- Settings Hint Tooltip -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardSettingsHint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="?attr/colorSurface"
+        app:layout_constraintBottom_toTopOf="@id/fabAddExpense"
+        app:layout_constraintEnd_toStartOf="@id/fabAddExpense">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Long press + button for settings"
+                android:textSize="12sp"
+                android:textColor="?attr/colorOnSurface"
+                android:fontFamily="sans-serif-medium"
+                android:maxWidth="140dp" />
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginStart="8dp"
+                android:src="@drawable/ic_settings"
+                android:tint="?attr/colorPrimary" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

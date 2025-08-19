@@ -1,10 +1,15 @@
 package com.example.budgetdeluminator
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -39,6 +44,7 @@ import com.example.budgetdeluminator.utils.Calculator
 import com.example.budgetdeluminator.utils.Constants
 import com.example.budgetdeluminator.utils.CurrencyPreferences
 import com.example.budgetdeluminator.utils.ErrorHandler
+import com.example.budgetdeluminator.utils.HintPreferences
 import com.example.budgetdeluminator.utils.RecurrenceScheduler
 import com.example.budgetdeluminator.utils.ThemePreferences
 import com.example.budgetdeluminator.utils.ValidationResult
@@ -77,6 +83,7 @@ class MainActivity :
     private val expensesViewModel: ExpensesViewModel by viewModels()
     private val recurringExpensesViewModel: RecurringExpensesViewModel by viewModels()
     private lateinit var currencyPreferences: CurrencyPreferences
+    private lateinit var hintPreferences: HintPreferences
     private val dateFormat = SimpleDateFormat(Constants.DATE_FORMAT_DISPLAY, Locale.US)
 
     private lateinit var homeFragment: HomeFragment
@@ -123,6 +130,7 @@ class MainActivity :
         setContentView(binding.root)
 
         currencyPreferences = CurrencyPreferences(this)
+        hintPreferences = HintPreferences(this)
 
         // Set secure flag if biometric authentication is enabled
         BiometricAuthHelper.updateSecureFlag(this)
@@ -133,6 +141,9 @@ class MainActivity :
         setupFragments()
         setupBottomNavigation()
         setupClickListeners()
+
+        // Show settings hint if it hasn't been shown yet
+        showSettingsHintIfNeeded()
 
         // Initialize recurring expense scheduling
         val recurrenceScheduler = RecurrenceScheduler(this)
@@ -154,6 +165,9 @@ class MainActivity :
 
     private fun setupBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
+            // Dismiss hint if visible when navigating
+            hideSettingsHint()
+
             when (item.itemId) {
                 R.id.nav_home -> {
                     replaceFragment(homeFragment)
@@ -200,6 +214,9 @@ class MainActivity :
 
     private fun setupClickListeners() {
         binding.fabAddExpense.setOnClickListener {
+            // Dismiss hint if visible
+            hideSettingsHint()
+
             when (currentFragmentType) {
                 FragmentType.HOME, FragmentType.ALL_EXPENSES -> startExpenseEntryFlow()
                 FragmentType.CATEGORIES -> showAddCategoryDialog()
@@ -207,6 +224,9 @@ class MainActivity :
             }
         }
         binding.fabAddExpense.setOnLongClickListener {
+            // Dismiss hint if visible
+            hideSettingsHint()
+
             settingsLauncher.launch(
                     Intent(
                             this,
@@ -559,10 +579,19 @@ class MainActivity :
         }
 
         // Category selector
-        dialogBinding.tvSelectedCategory.setOnClickListener {
+        val expenseCategoryClickListener = {
             showCategorySelectionDialog { category ->
                 selectedCategory = category
                 dialogBinding.tvSelectedCategory.setText(category.name)
+            }
+        }
+
+        dialogBinding.tvSelectedCategory.setOnClickListener { expenseCategoryClickListener() }
+
+        // Also set click listener for the dropdown arrow
+        dialogBinding.tvSelectedCategory.parent.let { parent ->
+            if (parent is com.google.android.material.textfield.TextInputLayout) {
+                parent.setEndIconOnClickListener { expenseCategoryClickListener() }
             }
         }
 
@@ -785,10 +814,19 @@ class MainActivity :
         }
 
         // Category selector
-        dialogBinding.tvSelectedCategory.setOnClickListener {
+        val editExpenseCategoryClickListener = {
             showCategorySelectionDialog { category ->
                 selectedCategory = category
                 dialogBinding.tvSelectedCategory.setText(category.name)
+            }
+        }
+
+        dialogBinding.tvSelectedCategory.setOnClickListener { editExpenseCategoryClickListener() }
+
+        // Also set click listener for the dropdown arrow
+        dialogBinding.tvSelectedCategory.parent.let { parent ->
+            if (parent is com.google.android.material.textfield.TextInputLayout) {
+                parent.setEndIconOnClickListener { editExpenseCategoryClickListener() }
             }
         }
 
@@ -1252,7 +1290,7 @@ class MainActivity :
         }
 
         // Recurrence type selector
-        dialogBinding.tvRecurrenceType.setOnClickListener {
+        val recurrenceTypeClickListener = {
             showRecurrenceTypeSelectionDialog { recurrenceType ->
                 selectedRecurrenceType = recurrenceType
                 dialogBinding.tvRecurrenceType.setText(getRecurrenceTypeDisplayName(recurrenceType))
@@ -1263,6 +1301,15 @@ class MainActivity :
                         "Select ${getRecurrenceValueLabel(recurrenceType)}"
                 )
                 selectedRecurrenceValue = 0 // Reset value when type changes
+            }
+        }
+
+        dialogBinding.tvRecurrenceType.setOnClickListener { recurrenceTypeClickListener() }
+
+        // Also set click listener for the dropdown arrow
+        dialogBinding.tvRecurrenceType.parent.let { parent ->
+            if (parent is com.google.android.material.textfield.TextInputLayout) {
+                parent.setEndIconOnClickListener { recurrenceTypeClickListener() }
             }
         }
 
@@ -1277,10 +1324,19 @@ class MainActivity :
         }
 
         // Category selector
-        dialogBinding.tvSelectedRecurringCategory.setOnClickListener {
+        val categoryClickListener = {
             showCategorySelectionDialog { category ->
                 selectedCategory = category
                 dialogBinding.tvSelectedRecurringCategory.setText(category.name)
+            }
+        }
+
+        dialogBinding.tvSelectedRecurringCategory.setOnClickListener { categoryClickListener() }
+
+        // Also set click listener for the dropdown arrow
+        dialogBinding.tvSelectedRecurringCategory.parent.let { parent ->
+            if (parent is com.google.android.material.textfield.TextInputLayout) {
+                parent.setEndIconOnClickListener { categoryClickListener() }
             }
         }
 
@@ -1693,5 +1749,95 @@ class MainActivity :
                 }
             }
         }
+    }
+
+    /** Shows a subtle hint for the settings long-press feature if it hasn't been shown yet */
+    private fun showSettingsHintIfNeeded() {
+        if (!hintPreferences.isSettingsHintShown()) {
+            // Delay showing the hint to ensure the UI is fully loaded
+            Handler(Looper.getMainLooper())
+                    .postDelayed({ showSettingsHint() }, 1500) // Show after 1.5 seconds
+        }
+    }
+
+    /** Shows the settings hint with subtle animation */
+    private fun showSettingsHint() {
+        binding.cardSettingsHint.visibility = View.VISIBLE
+
+        // Create fade-in and scale animation
+        val fadeIn = ObjectAnimator.ofFloat(binding.cardSettingsHint, "alpha", 0f, 1f)
+        val scaleX = ObjectAnimator.ofFloat(binding.cardSettingsHint, "scaleX", 0.8f, 1f)
+        val scaleY = ObjectAnimator.ofFloat(binding.cardSettingsHint, "scaleY", 0.8f, 1f)
+
+        val animatorSet = AnimatorSet()
+        animatorSet.playTogether(fadeIn, scaleX, scaleY)
+        animatorSet.duration = 300
+        animatorSet.interpolator = AccelerateDecelerateInterpolator()
+        animatorSet.start()
+
+        // Create subtle pulsing animation for the FAB
+        createFabPulseAnimation()
+
+        // Auto-hide the hint after 5 seconds
+        Handler(Looper.getMainLooper()).postDelayed({ hideSettingsHint() }, 5000)
+
+        // Hide hint when user taps anywhere or interacts with FAB
+        setupHintDismissListeners()
+    }
+
+    /** Creates a subtle pulsing animation for the FAB to draw attention */
+    private fun createFabPulseAnimation() {
+        val scaleUp = ObjectAnimator.ofFloat(binding.fabAddExpense, "scaleX", 1f, 1.1f)
+        val scaleUpY = ObjectAnimator.ofFloat(binding.fabAddExpense, "scaleY", 1f, 1.1f)
+        val scaleDown = ObjectAnimator.ofFloat(binding.fabAddExpense, "scaleX", 1.1f, 1f)
+        val scaleDownY = ObjectAnimator.ofFloat(binding.fabAddExpense, "scaleY", 1.1f, 1f)
+
+        val pulseUp = AnimatorSet()
+        pulseUp.playTogether(scaleUp, scaleUpY)
+        pulseUp.duration = 800
+
+        val pulseDown = AnimatorSet()
+        pulseDown.playTogether(scaleDown, scaleDownY)
+        pulseDown.duration = 800
+
+        val pulseSequence = AnimatorSet()
+        pulseSequence.playSequentially(pulseUp, pulseDown)
+        pulseSequence.interpolator = AccelerateDecelerateInterpolator()
+
+        // Repeat the pulse 2 times
+        pulseSequence.start()
+        Handler(Looper.getMainLooper()).postDelayed({ pulseSequence.start() }, 1600)
+    }
+
+    /** Sets up listeners to dismiss the hint when user interacts */
+    private fun setupHintDismissListeners() {
+        // Dismiss when user taps the hint itself
+        binding.cardSettingsHint.setOnClickListener { hideSettingsHint() }
+    }
+
+    /** Hides the settings hint with animation */
+    private fun hideSettingsHint() {
+        if (binding.cardSettingsHint.visibility != View.VISIBLE) return
+
+        val fadeOut = ObjectAnimator.ofFloat(binding.cardSettingsHint, "alpha", 1f, 0f)
+        val scaleX = ObjectAnimator.ofFloat(binding.cardSettingsHint, "scaleX", 1f, 0.8f)
+        val scaleY = ObjectAnimator.ofFloat(binding.cardSettingsHint, "scaleY", 1f, 0.8f)
+
+        val animatorSet = AnimatorSet()
+        animatorSet.playTogether(fadeOut, scaleX, scaleY)
+        animatorSet.duration = 200
+        animatorSet.interpolator = AccelerateDecelerateInterpolator()
+
+        animatorSet.addListener(
+                object : android.animation.AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: android.animation.Animator) {
+                        binding.cardSettingsHint.visibility = View.GONE
+                        // Mark hint as shown so it doesn't appear again
+                        hintPreferences.markSettingsHintShown()
+                    }
+                }
+        )
+
+        animatorSet.start()
     }
 }
